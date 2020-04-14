@@ -1,0 +1,8 @@
+- symbol: VTI
+  quantity: 1000
+  allocation: 60
+  basis: 0
+- symbol: BND
+  quantity: 1000
+  allocation: 40
+  basis: 0
