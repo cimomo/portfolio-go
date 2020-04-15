@@ -9,8 +9,21 @@ import (
 
 // Portfolio defines a portfolio of asset holdings
 type Portfolio struct {
-	Name     string
-	Holdings map[string]*Holding
+	Name             string
+	CostBasis        float64
+	Holdings         map[string]*Holding
+	TargetAllocation map[string]float64
+	Status           *Status
+}
+
+// Status defines the real-time status of the entire portfolio
+type Status struct {
+	Value                      float64
+	RegularMarketChange        float64
+	RegularMarketChangePercent float64
+	Unrealized                 float64
+	UnrealizedPercent          float64
+	Allocation                 map[string]float64
 }
 
 type holdingConfig struct {
@@ -25,8 +38,10 @@ type portfolioConfig []holdingConfig
 // NewPortfolio returns an empty portfolio of asset holdings
 func NewPortfolio(name string) *Portfolio {
 	return &Portfolio{
-		Name:     name,
-		Holdings: make(map[string]*Holding),
+		Name:             name,
+		Holdings:         make(map[string]*Holding),
+		TargetAllocation: make(map[string]float64),
+		Status:           &Status{},
 	}
 }
 
@@ -47,15 +62,16 @@ func (portfolio *Portfolio) Load(profile string) error {
 	for _, holdingConfig := range portfolioConfig {
 		portfolio.Holdings[holdingConfig.Symbol] = NewHolding(
 			holdingConfig.Symbol,
-			holdingConfig.TargetAllocation,
 			holdingConfig.Quantity,
 			holdingConfig.CostBasis)
+		portfolio.TargetAllocation[holdingConfig.Symbol] = holdingConfig.TargetAllocation
+		portfolio.CostBasis += holdingConfig.CostBasis
 	}
 
 	return nil
 }
 
-// Refresh computes the current status of the entire portfolio
+// Refresh computes the current status of the entire portfolio and its holdings
 func (portfolio *Portfolio) Refresh() {
 	symbols := make([]string, 0, len(portfolio.Holdings))
 
@@ -72,4 +88,23 @@ func (portfolio *Portfolio) Refresh() {
 		holding.Quote = quote
 		holding.RefreshStatus()
 	}
+
+	portfolio.RefreshStatus()
+}
+
+// RefreshStatus computes the current status of the entire portfolio
+func (portfolio *Portfolio) RefreshStatus() {
+	status := Status{}
+
+	for _, holding := range portfolio.Holdings {
+		status.Value += holding.Status.Value
+		status.RegularMarketChange += holding.Quote.RegularMarketChange
+		status.Unrealized += holding.Status.Unrealized
+	}
+
+	previousValue := status.Value + status.RegularMarketChange
+	status.RegularMarketChangePercent = (status.RegularMarketChange / previousValue) * 100
+	status.UnrealizedPercent = (status.Unrealized / portfolio.CostBasis) * 100
+
+	portfolio.Status = &status
 }

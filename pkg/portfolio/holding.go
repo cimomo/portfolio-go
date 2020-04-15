@@ -7,12 +7,11 @@ import (
 
 // Holding defines a position in the portfolio
 type Holding struct {
-	Asset            *Asset
-	Quote            *finance.Quote
-	TargetAllocation float64
-	Quantity         float64
-	CostBasis        float64
-	Status           *HoldingStatus
+	Asset     *Asset
+	Quantity  float64
+	CostBasis float64
+	Quote     *finance.Quote
+	Status    *HoldingStatus
 }
 
 // HoldingStatus defines the real-time status of a particular holding
@@ -23,21 +22,14 @@ type HoldingStatus struct {
 }
 
 // NewHolding returns a new holding object
-func NewHolding(symbol string, allocation float64, quantity float64, basis float64) *Holding {
-	holding := Holding{}
-
-	asset := NewAsset(symbol)
-
-	if asset == nil {
-		return nil
+func NewHolding(symbol string, quantity float64, basis float64) *Holding {
+	return &Holding{
+		Asset:     NewAsset(symbol),
+		Quantity:  quantity,
+		CostBasis: basis,
+		Quote:     &finance.Quote{},
+		Status:    &HoldingStatus{},
 	}
-
-	holding.Asset = asset
-	holding.TargetAllocation = allocation
-	holding.Quantity = quantity
-	holding.CostBasis = basis
-
-	return &holding
 }
 
 // Refresh gets the current quote and computes the current status of a particular holding

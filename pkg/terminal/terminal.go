@@ -35,12 +35,17 @@ func (term *Terminal) Stop() {
 // Initialize sets up the terminal screen
 func (term *Terminal) Initialize() {
 	table := tview.NewTable().SetBorders(false)
+	var cell *tview.TableCell
 	header := []string{
-		"SYMBOL", "CLASS", "QUANTITY", "PRICE", "1-Day CHANGE$", "1-Day CHANGE%", "VALUE", "1-Day CHANGE$", "UNREALIZED GAIN/LOSS$", "UNREALIZED GAIN/LOSS%",
+		"SYMBOL", "CLASS", "QUANTITY", "PRICE",
+		"1-Day CHANGE$", "1-Day CHANGE%",
+		"VALUE", "1-Day CHANGE$",
+		"UNREALIZED GAIN/LOSS$", "UNREALIZED GAIN/LOSS%",
+		"Target",
 	}
 
 	for c := 0; c < len(header); c++ {
-		cell := tview.NewTableCell(header[c]).SetTextColor(tcell.ColorYellow)
+		cell = tview.NewTableCell(header[c]).SetTextColor(tcell.ColorYellow).SetBackgroundColor(tcell.ColorDarkSlateGray)
 		if c < 2 {
 			cell.SetAlign(tview.AlignLeft)
 		} else {
@@ -50,10 +55,11 @@ func (term *Terminal) Initialize() {
 	}
 
 	printer := message.NewPrinter(language.English)
-	holdings := term.portfolio.Holdings
+	port := term.portfolio
+	holdings := port.Holdings
 	r := 1
 	for symbol, holding := range holdings {
-		cell := tview.NewTableCell(symbol).SetTextColor(tcell.ColorWhite).SetAlign(tview.AlignLeft).SetExpansion(1)
+		cell = tview.NewTableCell(symbol).SetTextColor(tcell.ColorWhite).SetAlign(tview.AlignLeft).SetExpansion(1)
 		table.SetCell(r, 0, cell)
 
 		class := printer.Sprintf("%s", holding.Asset.Subclass)
@@ -103,8 +109,49 @@ func (term *Terminal) Initialize() {
 		cell = tview.NewTableCell(gainP).SetTextColor(color).SetAlign(tview.AlignRight).SetExpansion(1)
 		table.SetCell(r, 9, cell)
 
+		target := printer.Sprintf("%.2f%%", port.TargetAllocation[symbol])
+		cell = tview.NewTableCell(target).SetTextColor(tcell.ColorWhite).SetAlign(tview.AlignRight).SetExpansion(1)
+		table.SetCell(r, 10, cell)
+
 		r++
 	}
+
+	cell = tview.NewTableCell("TOTAL").SetTextColor(tcell.ColorYellow).SetAlign(tview.AlignLeft).SetExpansion(1)
+	table.SetCell(r, 0, cell)
+
+	color := tcell.ColorGreen
+	if port.Status.RegularMarketChange < 0 {
+		color = tcell.ColorRed
+	}
+
+	value := printer.Sprintf("%.2f%%", port.Status.RegularMarketChangePercent)
+	cell = tview.NewTableCell(value).SetTextColor(color).SetAlign(tview.AlignRight).SetExpansion(1)
+	table.SetCell(r, 5, cell)
+
+	value = printer.Sprintf("$%.2f", port.Status.Value)
+	cell = tview.NewTableCell(value).SetTextColor(tcell.ColorYellow).SetAlign(tview.AlignRight).SetExpansion(1)
+	table.SetCell(r, 6, cell)
+
+	value = printer.Sprintf("$%.2f", port.Status.RegularMarketChange)
+	cell = tview.NewTableCell(value).SetTextColor(color).SetAlign(tview.AlignRight).SetExpansion(1)
+	table.SetCell(r, 7, cell)
+
+	color = tcell.ColorGreen
+	if port.Status.Unrealized < 0 {
+		color = tcell.ColorRed
+	}
+
+	value = printer.Sprintf("$%.2f", port.Status.Unrealized)
+	cell = tview.NewTableCell(value).SetTextColor(color).SetAlign(tview.AlignRight).SetExpansion(1)
+	table.SetCell(r, 8, cell)
+
+	value = printer.Sprintf("%.2f%%", port.Status.UnrealizedPercent)
+	cell = tview.NewTableCell(value).SetTextColor(color).SetAlign(tview.AlignRight).SetExpansion(1)
+	table.SetCell(r, 9, cell)
+
+	value = printer.Sprintf("%.2f%%", 100.0)
+	cell = tview.NewTableCell(value).SetTextColor(tcell.ColorYellow).SetAlign(tview.AlignRight).SetExpansion(1)
+	table.SetCell(r, 10, cell)
 
 	term.application.SetRoot(table, true)
 }
