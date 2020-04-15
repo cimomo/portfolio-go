@@ -1,6 +1,8 @@
 package terminal
 
 import (
+	"math"
+
 	"github.com/gdamore/tcell"
 	"github.com/rivo/tview"
 	"golang.org/x/text/language"
@@ -103,7 +105,13 @@ func (viewer *PortfolioViewer) setPercent(value float64, r int, c int, color tce
 }
 
 func (viewer *PortfolioViewer) setDollarAmount(value float64, r int, c int, color tcell.Color) {
-	viewer.setFloat64(value, "$%.2f", r, c, color)
+	formatter := "$%.2f"
+	if value < 0 {
+		formatter = "-$%.2f"
+	}
+
+	v := math.Abs(value)
+	viewer.setFloat64(v, formatter, r, c, color)
 }
 
 func (viewer *PortfolioViewer) setQuantity(value float64, r int, c int) {
