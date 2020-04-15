@@ -1,8 +1,20 @@
 - symbol: VTI
   quantity: 1000
-  allocation: 60
-  basis: 0
-- symbol: BND
+  allocation: 20
+  basis: 10000
+- symbol: VB
   quantity: 1000
-  allocation: 40
-  basis: 0
+  allocation: 20
+  basis: 10000
+- symbol: VGLT
+  quantity: 1000
+  allocation: 20
+  basis: 10000
+- symbol: SHY
+  quantity: 1000
+  allocation: 20
+  basis: 10000
+- symbol: IAU
+  quantity: 1000
+  allocation: 20
+  basis: 10000

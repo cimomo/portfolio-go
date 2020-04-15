@@ -5,24 +5,24 @@ type AssetClass string
 
 // Asset class definitions
 const (
-	AssetClassUSStock                      AssetClass = "USStock"
-	AssetClassUSStockLarge                 AssetClass = "USStockLarge"
-	AssetClassUSStockLargeValue            AssetClass = "USStockLargeValue"
-	AssetClassUSStockLargeGrowth           AssetClass = "USStockLargeGrowth"
-	AssetClassUSStockLargeTech             AssetClass = "USStockLargeTech"
-	AssetClassUSStockMid                   AssetClass = "USStockMid"
-	AssetClassUSStockSmall                 AssetClass = "USStockSmall"
-	AssetClassInternationalStock           AssetClass = "InternationalStock"
-	AssetClassEmergentMarketStock          AssetClass = "EmergentMarketStock"
-	AssetClassChinaStock                   AssetClass = "ChinaStock"
-	AssetClassUSRealEstate                 AssetClass = "USRealEstate"
-	AssetClassInternationalRealEstate      AssetClass = "InternationalRealEstate"
-	AssetClassUSBond                       AssetClass = "USBond"
-	AssetClassUSTreasury                   AssetClass = "USTreasury"
-	AssetClassUSTreasuryLongterm           AssetClass = "USTreasuryLongterm"
-	AssetClassUSTreasuryIntermediateTerm   AssetClass = "USTreasuryIntermediateTerm"
-	AssetClassUSTreasuryShortTerm          AssetClass = "USTreasuryShortTerm"
-	AssetClassUSTreasuryInflationProtected AssetClass = "USTreasuryInflationProtected"
+	AssetClassUSStock                      AssetClass = "US Stock"
+	AssetClassUSStockLarge                 AssetClass = "US Stock Large"
+	AssetClassUSStockLargeValue            AssetClass = "US Stock Large Value"
+	AssetClassUSStockLargeGrowth           AssetClass = "US Stock Large Growth"
+	AssetClassUSStockLargeTech             AssetClass = "US Stock Large Tech"
+	AssetClassUSStockMid                   AssetClass = "US Stock Mid"
+	AssetClassUSStockSmall                 AssetClass = "US Stock Small"
+	AssetClassInternationalStock           AssetClass = "International Stock"
+	AssetClassEmergentMarketStock          AssetClass = "EmergentMarket Stock"
+	AssetClassChinaStock                   AssetClass = "China Stock"
+	AssetClassUSRealEstate                 AssetClass = "US Real Estate"
+	AssetClassInternationalRealEstate      AssetClass = "International Real Estate"
+	AssetClassUSBond                       AssetClass = "US Bond"
+	AssetClassUSTreasury                   AssetClass = "US Treasury"
+	AssetClassUSTreasuryLongTerm           AssetClass = "US Treasury Long Term"
+	AssetClassUSTreasuryIntermediateTerm   AssetClass = "US Treasury Intermediate Term"
+	AssetClassUSTreasuryShortTerm          AssetClass = "US Treasury Short Term"
+	AssetClassUSTreasuryInflationProtected AssetClass = "US Treasury Inflation Protected"
 	AssetClassCommodity                    AssetClass = "Commodity"
 	AssetClassCrudeOil                     AssetClass = "CrudeOil"
 	AssetClassGold                         AssetClass = "Gold"
@@ -53,7 +53,7 @@ var AssetDB = func() map[string]*Asset {
 		"VNQI": {"VNQI", AssetClassInternationalRealEstate, AssetClassInternationalRealEstate},
 		"BND":  {"BND", AssetClassUSBond, AssetClassUSBond},
 		"GOVT": {"GOVT", AssetClassUSTreasury, AssetClassUSTreasury},
-		"VGLT": {"VGLT", AssetClassUSTreasury, AssetClassUSTreasuryLongterm},
+		"VGLT": {"VGLT", AssetClassUSTreasury, AssetClassUSTreasuryLongTerm},
 		"SPTI": {"SPTI", AssetClassUSTreasury, AssetClassUSTreasuryIntermediateTerm},
 		"SHY":  {"SHY", AssetClassUSTreasury, AssetClassUSTreasuryShortTerm},
 		"TIP":  {"TIP", AssetClassUSTreasury, AssetClassUSTreasuryInflationProtected},
