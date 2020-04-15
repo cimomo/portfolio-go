@@ -8,5 +8,6 @@ require (
 	github.com/gdamore/tcell v1.3.0
 	github.com/rivo/tview v0.0.0-20200414130344-8e06c826b3a5
 	github.com/shopspring/decimal v0.0.0-20200227202807-02e2044944cc // indirect
+	golang.org/x/text v0.3.2
 	gopkg.in/yaml.v2 v2.2.8
 )

@@ -1,11 +1,11 @@
 package terminal
 
 import (
-	"fmt"
-
 	"github.com/cimomo/portfolio-go/pkg/portfolio"
 	"github.com/gdamore/tcell"
 	"github.com/rivo/tview"
+	"golang.org/x/text/language"
+	"golang.org/x/text/message"
 )
 
 // Terminal defines the main terminal window for portfolio visualization
@@ -49,21 +49,22 @@ func (term *Terminal) Initialize() {
 		table.SetCell(0, c, cell)
 	}
 
+	printer := message.NewPrinter(language.English)
 	holdings := term.portfolio.Holdings
 	r := 1
 	for symbol, holding := range holdings {
 		cell := tview.NewTableCell(symbol).SetTextColor(tcell.ColorWhite).SetAlign(tview.AlignLeft).SetExpansion(1)
 		table.SetCell(r, 0, cell)
 
-		class := fmt.Sprintf("%s", holding.Asset.Subclass)
+		class := printer.Sprintf("%s", holding.Asset.Subclass)
 		cell = tview.NewTableCell(class).SetTextColor(tcell.ColorWhite).SetAlign(tview.AlignLeft).SetExpansion(1)
 		table.SetCell(r, 1, cell)
 
-		quantity := fmt.Sprintf("%.2f", holding.Quantity)
+		quantity := printer.Sprintf("%.2f", holding.Quantity)
 		cell = tview.NewTableCell(quantity).SetTextColor(tcell.ColorWhite).SetAlign(tview.AlignRight).SetExpansion(1)
 		table.SetCell(r, 2, cell)
 
-		price := fmt.Sprintf("$%.2f", holding.Quote.RegularMarketPrice)
+		price := printer.Sprintf("$%.2f", holding.Quote.RegularMarketPrice)
 		cell = tview.NewTableCell(price).SetTextColor(tcell.ColorWhite).SetAlign(tview.AlignRight).SetExpansion(1)
 		table.SetCell(r, 3, cell)
 
@@ -72,20 +73,20 @@ func (term *Terminal) Initialize() {
 			color = tcell.ColorRed
 		}
 
-		change := fmt.Sprintf("$%.2f", holding.Quote.RegularMarketChange)
+		change := printer.Sprintf("$%.2f", holding.Quote.RegularMarketChange)
 		cell = tview.NewTableCell(change).SetTextColor(color).SetAlign(tview.AlignRight).SetExpansion(1)
 		table.SetCell(r, 4, cell)
 
-		changeP := fmt.Sprintf("%.2f%%", holding.Quote.RegularMarketChangePercent)
+		changeP := printer.Sprintf("%.2f%%", holding.Quote.RegularMarketChangePercent)
 		cell = tview.NewTableCell(changeP).SetTextColor(color).SetAlign(tview.AlignRight).SetExpansion(1)
 		table.SetCell(r, 5, cell)
 
-		value := fmt.Sprintf("$%.2f", holding.Status.Value)
+		value := printer.Sprintf("$%.2f", holding.Status.Value)
 		cell = tview.NewTableCell(value).SetTextColor(tcell.ColorWhite).SetAlign(tview.AlignRight).SetExpansion(1)
 		table.SetCell(r, 6, cell)
 
 		valueChange := holding.Quote.RegularMarketChange * holding.Quantity
-		change = fmt.Sprintf("$%.2f", valueChange)
+		change = printer.Sprintf("$%.2f", valueChange)
 		cell = tview.NewTableCell(change).SetTextColor(color).SetAlign(tview.AlignRight).SetExpansion(1)
 		table.SetCell(r, 7, cell)
 
@@ -94,11 +95,11 @@ func (term *Terminal) Initialize() {
 			color = tcell.ColorRed
 		}
 
-		gain := fmt.Sprintf("$%.2f", holding.Status.Unrealized)
+		gain := printer.Sprintf("$%.2f", holding.Status.Unrealized)
 		cell = tview.NewTableCell(gain).SetTextColor(color).SetAlign(tview.AlignRight).SetExpansion(1)
 		table.SetCell(r, 8, cell)
 
-		gainP := fmt.Sprintf("%.2f%%", holding.Status.UnrealizedPercent)
+		gainP := printer.Sprintf("%.2f%%", holding.Status.UnrealizedPercent)
 		cell = tview.NewTableCell(gainP).SetTextColor(color).SetAlign(tview.AlignRight).SetExpansion(1)
 		table.SetCell(r, 9, cell)
 
