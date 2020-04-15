@@ -98,11 +98,11 @@ func (portfolio *Portfolio) RefreshStatus() {
 
 	for _, holding := range portfolio.Holdings {
 		status.Value += holding.Status.Value
-		status.RegularMarketChange += holding.Quote.RegularMarketChange
+		status.RegularMarketChange += holding.Quote.RegularMarketChange * holding.Quantity
 		status.Unrealized += holding.Status.Unrealized
 	}
 
-	previousValue := status.Value + status.RegularMarketChange
+	previousValue := status.Value - status.RegularMarketChange
 	status.RegularMarketChangePercent = (status.RegularMarketChange / previousValue) * 100
 	status.UnrealizedPercent = (status.Unrealized / portfolio.CostBasis) * 100
 
