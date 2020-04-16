@@ -11,6 +11,7 @@ import (
 type Portfolio struct {
 	Name             string
 	CostBasis        float64
+	Symbols          []string
 	Holdings         map[string]*Holding
 	TargetAllocation map[string]float64
 	Status           *Status
@@ -39,6 +40,7 @@ type portfolioConfig []holdingConfig
 func NewPortfolio(name string) *Portfolio {
 	return &Portfolio{
 		Name:             name,
+		Symbols:          make([]string, 0),
 		Holdings:         make(map[string]*Holding),
 		TargetAllocation: make(map[string]float64),
 		Status:           &Status{},
@@ -60,6 +62,7 @@ func (portfolio *Portfolio) Load(profile string) error {
 	}
 
 	for _, holdingConfig := range portfolioConfig {
+		portfolio.Symbols = append(portfolio.Symbols, holdingConfig.Symbol)
 		portfolio.Holdings[holdingConfig.Symbol] = NewHolding(
 			holdingConfig.Symbol,
 			holdingConfig.Quantity,
@@ -73,13 +76,7 @@ func (portfolio *Portfolio) Load(profile string) error {
 
 // Refresh computes the current status of the entire portfolio and its holdings
 func (portfolio *Portfolio) Refresh() {
-	symbols := make([]string, 0, len(portfolio.Holdings))
-
-	for symbol := range portfolio.Holdings {
-		symbols = append(symbols, symbol)
-	}
-
-	result := quote.List(symbols)
+	result := quote.List(portfolio.Symbols)
 
 	for result.Next() {
 		quote := result.Quote()

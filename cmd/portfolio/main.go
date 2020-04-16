@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"log"
 
 	"github.com/cimomo/portfolio-go/pkg/portfolio"
@@ -17,8 +16,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	fmt.Println("Hello, Portfolio", p.Holdings["VTI"].Status.Value)
 
 	startTerminal(p)
 }

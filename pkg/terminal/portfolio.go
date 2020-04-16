@@ -65,7 +65,8 @@ func (viewer *PortfolioViewer) drawPortfolio() {
 	holdings := port.Holdings
 
 	r := 1
-	for symbol, holding := range holdings {
+	for _, symbol := range port.Symbols {
+		holding := holdings[symbol]
 		viewer.setString(symbol, r, 0, tcell.ColorWhite, tview.AlignLeft)
 		viewer.setString(string(holding.Asset.Subclass), r, 1, tcell.ColorWhite, tview.AlignLeft)
 		viewer.setQuantity(holding.Quantity, r, 2)
