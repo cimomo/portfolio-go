@@ -33,6 +33,12 @@ func (viewer *PortfolioViewer) Connect() {
 	viewer.terminal.application.SetRoot(viewer.table, true)
 }
 
+// Refresh fetches the latest portfolio data and refreshes the viewer
+func (viewer *PortfolioViewer) Refresh() {
+	viewer.terminal.portfolio.Refresh()
+	viewer.drawPortfolio()
+}
+
 func (viewer *PortfolioViewer) drawHeader() {
 	var cell *tview.TableCell
 	header := []string{
@@ -40,7 +46,7 @@ func (viewer *PortfolioViewer) drawHeader() {
 		"1-Day CHANGE$", "1-Day CHANGE%",
 		"VALUE", "1-Day VALUE CHANGE$",
 		"UNREALIZED GAIN/LOSS$", "UNREALIZED GAIN/LOSS%",
-		"Target",
+		"Allocation", "Target",
 	}
 
 	for c := 0; c < len(header); c++ {
@@ -70,7 +76,8 @@ func (viewer *PortfolioViewer) drawPortfolio() {
 		viewer.setDollarChange(holding.Quote.RegularMarketChange*holding.Quantity, r, 7)
 		viewer.setDollarChange(holding.Status.Unrealized, r, 8)
 		viewer.setPercentChange(holding.Status.UnrealizedPercent, r, 9)
-		viewer.setPercent(port.TargetAllocation[symbol], r, 10, tcell.ColorWhite)
+		viewer.setPercent(port.Status.Allocation[symbol], r, 10, tcell.ColorWhite)
+		viewer.setPercent(port.TargetAllocation[symbol], r, 11, tcell.ColorWhite)
 
 		r++
 	}
@@ -82,6 +89,7 @@ func (viewer *PortfolioViewer) drawPortfolio() {
 	viewer.setDollarChange(port.Status.Unrealized, r, 8)
 	viewer.setPercentChange(port.Status.UnrealizedPercent, r, 9)
 	viewer.setPercent(100.0, r, 10, tcell.ColorYellow)
+	viewer.setPercent(100.0, r, 11, tcell.ColorYellow)
 }
 
 func (viewer *PortfolioViewer) setPercentChange(value float64, r int, c int) {

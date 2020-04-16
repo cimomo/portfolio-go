@@ -25,6 +25,5 @@ func loadPortfolio(name string) *portfolio.Portfolio {
 
 func startTerminal(portfolio *portfolio.Portfolio) {
 	term := terminal.NewTerminal(portfolio)
-	term.Initialize()
 	term.Start()
 }

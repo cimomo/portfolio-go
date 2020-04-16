@@ -94,7 +94,9 @@ func (portfolio *Portfolio) Refresh() {
 
 // RefreshStatus computes the current status of the entire portfolio
 func (portfolio *Portfolio) RefreshStatus() {
-	status := Status{}
+	status := Status{
+		Allocation: make(map[string]float64),
+	}
 
 	for _, holding := range portfolio.Holdings {
 		status.Value += holding.Status.Value
@@ -105,6 +107,10 @@ func (portfolio *Portfolio) RefreshStatus() {
 	previousValue := status.Value - status.RegularMarketChange
 	status.RegularMarketChangePercent = (status.RegularMarketChange / previousValue) * 100
 	status.UnrealizedPercent = (status.Unrealized / portfolio.CostBasis) * 100
+
+	for symbol, holding := range portfolio.Holdings {
+		status.Allocation[symbol] = (holding.Status.Value / status.Value) * 100
+	}
 
 	portfolio.Status = &status
 }
