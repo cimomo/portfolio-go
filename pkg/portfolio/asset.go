@@ -16,6 +16,7 @@ const (
 	AssetClassEmergentMarketStock          AssetClass = "EmergentMarket Stock"
 	AssetClassChinaStock                   AssetClass = "China Stock"
 	AssetClassUSRealEstate                 AssetClass = "US Real Estate"
+	AssetClassUSRealEstateExperiential     AssetClass = "US Real Estate Experiential"
 	AssetClassInternationalRealEstate      AssetClass = "International Real Estate"
 	AssetClassUSBond                       AssetClass = "US Bond"
 	AssetClassUSTreasury                   AssetClass = "US Treasury"
@@ -42,6 +43,7 @@ var AssetDB = func() map[string]*Asset {
 	return map[string]*Asset{
 		"VTI":  {"VTI", AssetClassUSStock, AssetClassUSStockLarge},
 		"VTV":  {"VTV", AssetClassUSStock, AssetClassUSStockLargeValue},
+		"VIG":  {"VTV", AssetClassUSStock, AssetClassUSStockLarge},
 		"VUG":  {"VUG", AssetClassUSStock, AssetClassUSStockLargeGrowth},
 		"QQQ":  {"QQQ", AssetClassUSStock, AssetClassUSStockLargeTech},
 		"VO":   {"VO", AssetClassUSStock, AssetClassUSStockMid},
@@ -50,6 +52,7 @@ var AssetDB = func() map[string]*Asset {
 		"VWO":  {"VWO", AssetClassInternationalStock, AssetClassEmergentMarketStock},
 		"GXC":  {"GXC", AssetClassChinaStock, AssetClassChinaStock},
 		"VNQ":  {"VNQ", AssetClassUSRealEstate, AssetClassUSRealEstate},
+		"EPR":  {"EPR", AssetClassUSRealEstate, AssetClassUSRealEstateExperiential},
 		"VNQI": {"VNQI", AssetClassInternationalRealEstate, AssetClassInternationalRealEstate},
 		"BND":  {"BND", AssetClassUSBond, AssetClassUSBond},
 		"GOVT": {"GOVT", AssetClassUSTreasury, AssetClassUSTreasury},
