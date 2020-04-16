@@ -1,26 +1,39 @@
 package main
 
 import (
+	"flag"
 	"fmt"
+	"log"
 
 	"github.com/cimomo/portfolio-go/pkg/portfolio"
 	"github.com/cimomo/portfolio-go/pkg/terminal"
 )
 
 func main() {
-	p := loadPortfolio("Main")
+	profile := flag.String("profile", "./examples/profile.yml", "(optional) Profile for portfolio")
+	flag.Parse()
+
+	p, err := loadPortfolio("Main", *profile)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	fmt.Println("Hello, Portfolio", p.Holdings["VTI"].Status.Value)
 
 	startTerminal(p)
 }
 
-func loadPortfolio(name string) *portfolio.Portfolio {
+func loadPortfolio(name string, profile string) (*portfolio.Portfolio, error) {
 	p := portfolio.NewPortfolio("Main")
-	p.Load("./examples/profile.yml")
+
+	err := p.Load(profile)
+	if err != nil {
+		return nil, err
+	}
+
 	p.Refresh()
 
-	return p
+	return p, nil
 }
 
 func startTerminal(portfolio *portfolio.Portfolio) {
