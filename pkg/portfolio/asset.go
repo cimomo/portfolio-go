@@ -13,7 +13,7 @@ const (
 	AssetClassUSStockMid                   AssetClass = "US Stock Mid"
 	AssetClassUSStockSmall                 AssetClass = "US Stock Small"
 	AssetClassInternationalStock           AssetClass = "International Stock"
-	AssetClassEmergentMarketStock          AssetClass = "EmergentMarket Stock"
+	AssetClassEmergingMarketStock          AssetClass = "Emerging Market Stock"
 	AssetClassChinaStock                   AssetClass = "China Stock"
 	AssetClassUSRealEstate                 AssetClass = "US Real Estate"
 	AssetClassUSRealEstateExperiential     AssetClass = "US Real Estate Experiential"
@@ -48,8 +48,9 @@ var AssetDB = func() map[string]*Asset {
 		"QQQ":  {"QQQ", AssetClassUSStock, AssetClassUSStockLargeTech},
 		"VO":   {"VO", AssetClassUSStock, AssetClassUSStockMid},
 		"VB":   {"VB", AssetClassUSStock, AssetClassUSStockSmall},
+		"VEU":  {"VEU", AssetClassInternationalStock, AssetClassInternationalStock},
 		"VXUS": {"VXUS", AssetClassInternationalStock, AssetClassInternationalStock},
-		"VWO":  {"VWO", AssetClassInternationalStock, AssetClassEmergentMarketStock},
+		"VWO":  {"VWO", AssetClassInternationalStock, AssetClassEmergingMarketStock},
 		"GXC":  {"GXC", AssetClassChinaStock, AssetClassChinaStock},
 		"VNQ":  {"VNQ", AssetClassUSRealEstate, AssetClassUSRealEstate},
 		"EPR":  {"EPR", AssetClassUSRealEstate, AssetClassUSRealEstateExperiential},
