@@ -1,6 +1,7 @@
 package portfolio
 
 import (
+	"errors"
 	"io/ioutil"
 
 	"github.com/piquette/finance-go/quote"
@@ -61,6 +62,8 @@ func (portfolio *Portfolio) Load(profile string) error {
 		return err
 	}
 
+	totalAllocation := 0.0
+
 	for _, holdingConfig := range portfolioConfig {
 		portfolio.Symbols = append(portfolio.Symbols, holdingConfig.Symbol)
 		portfolio.Holdings[holdingConfig.Symbol] = NewHolding(
@@ -68,7 +71,12 @@ func (portfolio *Portfolio) Load(profile string) error {
 			holdingConfig.Quantity,
 			holdingConfig.CostBasis)
 		portfolio.TargetAllocation[holdingConfig.Symbol] = holdingConfig.TargetAllocation
+		totalAllocation += holdingConfig.TargetAllocation
 		portfolio.CostBasis += holdingConfig.CostBasis
+	}
+
+	if totalAllocation != 100.0 {
+		return errors.New("Total allocation should be 100%")
 	}
 
 	return nil
