@@ -30,7 +30,7 @@ func (term *Terminal) Start() {
 	portfolioViewer := NewPortfolioViewer(term.portfolio)
 	term.portfolioViewer = portfolioViewer
 
-	marketViewer := NewMarketViewer(term.portfolio)
+	marketViewer := NewMarketViewer(term.market)
 	term.marketViewer = marketViewer
 
 	term.setLayout()

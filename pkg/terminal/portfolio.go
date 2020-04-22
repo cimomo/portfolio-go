@@ -1,13 +1,9 @@
 package terminal
 
 import (
-	"math"
-
 	"github.com/cimomo/portfolio-go/pkg/portfolio"
 	"github.com/gdamore/tcell"
 	"github.com/rivo/tview"
-	"golang.org/x/text/language"
-	"golang.org/x/text/message"
 )
 
 // PortfolioViewer displays real-time portfolio data
@@ -24,7 +20,7 @@ func NewPortfolioViewer(portfolio *portfolio.Portfolio) *PortfolioViewer {
 	}
 
 	viewer.drawHeader()
-	viewer.drawPortfolio()
+	viewer.Refresh()
 
 	return &viewer
 }
@@ -63,73 +59,28 @@ func (viewer *PortfolioViewer) drawPortfolio() {
 	r := 1
 	for _, symbol := range port.Symbols {
 		holding := holdings[symbol]
-		viewer.setString(symbol, r, 0, tcell.ColorWhite, tview.AlignLeft)
-		viewer.setString(string(holding.Asset.Subclass), r, 1, tcell.ColorWhite, tview.AlignLeft)
-		viewer.setQuantity(holding.Quantity, r, 2)
-		viewer.setDollarAmount(holding.Quote.RegularMarketPrice, r, 3, tcell.ColorWhite)
-		viewer.setDollarChange(holding.Quote.RegularMarketChange, r, 4)
-		viewer.setPercentChange(holding.Quote.RegularMarketChangePercent, r, 5)
-		viewer.setDollarAmount(holding.Status.Value, r, 6, tcell.ColorWhite)
-		viewer.setDollarChange(holding.Quote.RegularMarketChange*holding.Quantity, r, 7)
-		viewer.setDollarChange(holding.Status.Unrealized, r, 8)
-		viewer.setPercentChange(holding.Status.UnrealizedPercent, r, 9)
-		viewer.setPercent(port.Status.Allocation[symbol], r, 10, tcell.ColorWhite)
-		viewer.setPercent(port.TargetAllocation[symbol], r, 11, tcell.ColorWhite)
+		setString(viewer.table, symbol, r, 0, tcell.ColorWhite, tview.AlignLeft, 1)
+		setString(viewer.table, string(holding.Asset.Subclass), r, 1, tcell.ColorWhite, tview.AlignLeft, 1)
+		setQuantity(viewer.table, holding.Quantity, r, 2, tview.AlignCenter, 1)
+		setDollarAmount(viewer.table, holding.Quote.RegularMarketPrice, r, 3, tcell.ColorWhite)
+		setDollarChange(viewer.table, holding.Quote.RegularMarketChange, r, 4)
+		setPercentChange(viewer.table, holding.Quote.RegularMarketChangePercent, r, 5)
+		setDollarAmount(viewer.table, holding.Status.Value, r, 6, tcell.ColorWhite)
+		setDollarChange(viewer.table, holding.Quote.RegularMarketChange*holding.Quantity, r, 7)
+		setDollarChange(viewer.table, holding.Status.Unrealized, r, 8)
+		setPercentChange(viewer.table, holding.Status.UnrealizedPercent, r, 9)
+		setPercent(viewer.table, port.Status.Allocation[symbol], r, 10, tcell.ColorWhite)
+		setPercent(viewer.table, port.TargetAllocation[symbol], r, 11, tcell.ColorWhite)
 
 		r++
 	}
 
-	viewer.setString("TOTAL", r, 0, tcell.ColorYellow, tview.AlignLeft)
-	viewer.setPercentChange(port.Status.RegularMarketChangePercent, r, 5)
-	viewer.setDollarAmount(port.Status.Value, r, 6, tcell.ColorYellow)
-	viewer.setDollarChange(port.Status.RegularMarketChange, r, 7)
-	viewer.setDollarChange(port.Status.Unrealized, r, 8)
-	viewer.setPercentChange(port.Status.UnrealizedPercent, r, 9)
-	viewer.setPercent(100.0, r, 10, tcell.ColorYellow)
-	viewer.setPercent(100.0, r, 11, tcell.ColorYellow)
-}
-
-func (viewer *PortfolioViewer) setPercentChange(value float64, r int, c int) {
-	color := tcell.ColorGreen
-	if value < 0 {
-		color = tcell.ColorRed
-	}
-	viewer.setPercent(value, r, c, color)
-}
-
-func (viewer *PortfolioViewer) setDollarChange(value float64, r int, c int) {
-	color := tcell.ColorGreen
-	if value < 0 {
-		color = tcell.ColorRed
-	}
-	viewer.setDollarAmount(value, r, c, color)
-}
-
-func (viewer *PortfolioViewer) setPercent(value float64, r int, c int, color tcell.Color) {
-	viewer.setFloat64(value, "%.2f%%", r, c, color)
-}
-
-func (viewer *PortfolioViewer) setDollarAmount(value float64, r int, c int, color tcell.Color) {
-	formatter := "$%.2f"
-	if value < 0 {
-		formatter = "-$%.2f"
-	}
-
-	v := math.Abs(value)
-	viewer.setFloat64(v, formatter, r, c, color)
-}
-
-func (viewer *PortfolioViewer) setQuantity(value float64, r int, c int) {
-	viewer.setFloat64(value, "%.2f", r, c, tcell.ColorWhite)
-}
-
-func (viewer *PortfolioViewer) setFloat64(value float64, formatter string, r int, c int, color tcell.Color) {
-	printer := message.NewPrinter(language.English)
-	fValue := printer.Sprintf(formatter, value)
-	viewer.setString(fValue, r, c, color, tview.AlignRight)
-}
-
-func (viewer *PortfolioViewer) setString(value string, r int, c int, color tcell.Color, align int) {
-	cell := tview.NewTableCell(value).SetTextColor(color).SetAlign(align).SetExpansion(1)
-	viewer.table.SetCell(r, c, cell)
+	setString(viewer.table, "TOTAL", r, 0, tcell.ColorYellow, tview.AlignLeft, 1)
+	setPercentChange(viewer.table, port.Status.RegularMarketChangePercent, r, 5)
+	setDollarAmount(viewer.table, port.Status.Value, r, 6, tcell.ColorYellow)
+	setDollarChange(viewer.table, port.Status.RegularMarketChange, r, 7)
+	setDollarChange(viewer.table, port.Status.Unrealized, r, 8)
+	setPercentChange(viewer.table, port.Status.UnrealizedPercent, r, 9)
+	setPercent(viewer.table, 100.0, r, 10, tcell.ColorYellow)
+	setPercent(viewer.table, 100.0, r, 11, tcell.ColorYellow)
 }
