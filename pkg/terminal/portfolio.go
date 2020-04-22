@@ -3,6 +3,7 @@ package terminal
 import (
 	"math"
 
+	"github.com/cimomo/portfolio-go/pkg/portfolio"
 	"github.com/gdamore/tcell"
 	"github.com/rivo/tview"
 	"golang.org/x/text/language"
@@ -11,15 +12,15 @@ import (
 
 // PortfolioViewer displays real-time portfolio data
 type PortfolioViewer struct {
-	terminal *Terminal
-	table    *tview.Table
+	portfolio *portfolio.Portfolio
+	table     *tview.Table
 }
 
 // NewPortfolioViewer returns a new viewer for the real-time portfolio data
-func NewPortfolioViewer(term *Terminal) *PortfolioViewer {
+func NewPortfolioViewer(portfolio *portfolio.Portfolio) *PortfolioViewer {
 	viewer := PortfolioViewer{
-		terminal: term,
-		table:    tview.NewTable().SetBorders(false),
+		portfolio: portfolio,
+		table:     tview.NewTable().SetBorders(false),
 	}
 
 	viewer.drawHeader()
@@ -28,14 +29,9 @@ func NewPortfolioViewer(term *Terminal) *PortfolioViewer {
 	return &viewer
 }
 
-// Connect adds the portfolio viewer to the parent terminal
-func (viewer *PortfolioViewer) Connect() {
-	viewer.terminal.application.SetRoot(viewer.table, true)
-}
-
 // Refresh fetches the latest portfolio data and refreshes the viewer
 func (viewer *PortfolioViewer) Refresh() {
-	viewer.terminal.portfolio.Refresh()
+	viewer.portfolio.Refresh()
 	viewer.drawPortfolio()
 }
 
@@ -61,7 +57,7 @@ func (viewer *PortfolioViewer) drawHeader() {
 }
 
 func (viewer *PortfolioViewer) drawPortfolio() {
-	port := viewer.terminal.portfolio
+	port := viewer.portfolio
 	holdings := port.Holdings
 
 	r := 1

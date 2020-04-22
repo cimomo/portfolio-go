@@ -17,7 +17,9 @@ func main() {
 		log.Fatal(err)
 	}
 
-	startTerminal(p)
+	m := portfolio.NewMarket()
+
+	startTerminal(m, p)
 }
 
 func loadPortfolio(name string, profile string) (*portfolio.Portfolio, error) {
@@ -33,7 +35,7 @@ func loadPortfolio(name string, profile string) (*portfolio.Portfolio, error) {
 	return p, nil
 }
 
-func startTerminal(portfolio *portfolio.Portfolio) {
-	term := terminal.NewTerminal(portfolio)
+func startTerminal(market *portfolio.Market, portfolio *portfolio.Portfolio) {
+	term := terminal.NewTerminal(market, portfolio)
 	term.Start()
 }

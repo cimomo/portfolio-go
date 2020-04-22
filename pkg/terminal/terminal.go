@@ -10,23 +10,31 @@ import (
 // Terminal defines the main terminal window for portfolio visualization
 type Terminal struct {
 	application     *tview.Application
+	market          *portfolio.Market
 	portfolio       *portfolio.Portfolio
+	marketViewer    *MarketViewer
 	portfolioViewer *PortfolioViewer
 }
 
 // NewTerminal returns a new terminal window
-func NewTerminal(portfolio *portfolio.Portfolio) *Terminal {
+func NewTerminal(market *portfolio.Market, portfolio *portfolio.Portfolio) *Terminal {
 	return &Terminal{
 		application: tview.NewApplication(),
 		portfolio:   portfolio,
+		market:      market,
 	}
 }
 
 // Start starts the terminal application
 func (term *Terminal) Start() {
-	viewer := NewPortfolioViewer(term)
-	term.portfolioViewer = viewer
-	viewer.Connect()
+	portfolioViewer := NewPortfolioViewer(term.portfolio)
+	term.portfolioViewer = portfolioViewer
+
+	marketViewer := NewMarketViewer(term.portfolio)
+	term.marketViewer = marketViewer
+
+	term.setLayout()
+
 	go term.refresh()
 	term.application.Run()
 }
@@ -46,4 +54,8 @@ func (term *Terminal) refresh() {
 			})
 		}
 	}
+}
+
+func (term *Terminal) setLayout() {
+	term.application.SetRoot(term.portfolioViewer.table, true)
 }
