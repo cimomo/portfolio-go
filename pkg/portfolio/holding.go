@@ -63,7 +63,10 @@ func (holding *Holding) RefreshStatus() {
 
 	status.Value = quote.RegularMarketPrice * holding.Quantity
 	status.Unrealized = status.Value - holding.CostBasis
-	status.UnrealizedPercent = (status.Unrealized / holding.CostBasis) * 100
+	status.UnrealizedPercent = 0
+	if holding.CostBasis != 0 {
+		status.UnrealizedPercent = (status.Unrealized / holding.CostBasis) * 100
+	}
 
 	holding.Status = &status
 }
