@@ -57,7 +57,7 @@ func (term *Terminal) refresh() {
 }
 
 func (term *Terminal) setLayout() {
-	grid := tview.NewGrid().SetRows(3, 0).SetColumns(0).SetBorders(false).
+	grid := tview.NewGrid().SetRows(4, 0).SetColumns(0).SetBorders(false).
 		AddItem(term.marketViewer.table, 0, 0, 1, 1, 0, 0, false).
 		AddItem(term.portfolioViewer.table, 1, 0, 1, 1, 0, 0, false)
 	term.application.SetRoot(grid, true)
