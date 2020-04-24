@@ -51,6 +51,7 @@ func (term *Terminal) refresh() {
 		case <-ticker.C:
 			term.application.QueueUpdateDraw(func() {
 				term.portfolioViewer.Refresh()
+				term.marketViewer.Refresh()
 			})
 		}
 	}
