@@ -34,7 +34,7 @@ func (viewer *MarketViewer) Refresh() {
 func (viewer *MarketViewer) drawHeader() {
 	var cell *tview.TableCell
 	header := []string{
-		"Dow", "S&P 500", "Nasdaq",
+		"Dow 30", "S&P 500", "Nasdaq", "Russell 2000",
 	}
 
 	for c := 0; c < len(header); c++ {
@@ -54,8 +54,10 @@ func (viewer *MarketViewer) drawMarket() {
 	setQuantity(viewer.table, market.Dow.RegularMarketPrice, 1, 0, tview.AlignCenter, 0)
 	setQuantity(viewer.table, market.SP500.RegularMarketPrice, 1, 1, tview.AlignCenter, 0)
 	setQuantity(viewer.table, market.Nasdaq.RegularMarketPrice, 1, 2, tview.AlignCenter, 0)
+	setQuantity(viewer.table, market.Russell2000.RegularMarketPrice, 1, 3, tview.AlignCenter, 0)
 
 	setChangeAndPercent(viewer.table, market.Dow.RegularMarketChange, market.Dow.RegularMarketChangePercent, 2, 0, tview.AlignCenter, 0)
 	setChangeAndPercent(viewer.table, market.SP500.RegularMarketChange, market.Dow.RegularMarketChangePercent, 2, 1, tview.AlignCenter, 0)
 	setChangeAndPercent(viewer.table, market.Nasdaq.RegularMarketChange, market.Dow.RegularMarketChangePercent, 2, 2, tview.AlignCenter, 0)
+	setChangeAndPercent(viewer.table, market.Russell2000.RegularMarketChange, market.Dow.RegularMarketChangePercent, 2, 3, tview.AlignCenter, 0)
 }

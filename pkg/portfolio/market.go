@@ -7,16 +7,18 @@ import (
 
 // Market index symbols
 const (
-	Dow    string = "^DJI"
-	SP500  string = "^GSPC"
-	Nasdaq string = "^IXIC"
+	Dow         string = "^DJI"
+	SP500       string = "^GSPC"
+	Nasdaq      string = "^IXIC"
+	Russell2000 string = "^RUT"
 )
 
 // Market defines the broader market indices we track
 type Market struct {
-	Dow    *finance.Index
-	SP500  *finance.Index
-	Nasdaq *finance.Index
+	Dow         *finance.Index
+	SP500       *finance.Index
+	Nasdaq      *finance.Index
+	Russell2000 *finance.Index
 }
 
 // NewMarket returns a new market
@@ -41,9 +43,15 @@ func (market *Market) Refresh() error {
 		return err
 	}
 
+	russell2000, err := index.Get(Russell2000)
+	if err != nil {
+		return err
+	}
+
 	market.Dow = dow
 	market.SP500 = sp500
 	market.Nasdaq = nasdaq
+	market.Russell2000 = russell2000
 
 	return nil
 }
