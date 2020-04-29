@@ -1,9 +1,14 @@
 package terminal
 
 import (
+	"math"
+
 	"github.com/cimomo/portfolio-go/pkg/portfolio"
 	"github.com/gdamore/tcell"
+	"github.com/piquette/finance-go"
 	"github.com/rivo/tview"
+	"golang.org/x/text/language"
+	"golang.org/x/text/message"
 )
 
 // MarketViewer displays real-time market data
@@ -19,7 +24,6 @@ func NewMarketViewer(market *portfolio.Market) *MarketViewer {
 		table:  tview.NewTable().SetBorders(false).SetSeparator(' '),
 	}
 
-	viewer.drawHeader()
 	viewer.Refresh()
 
 	return &viewer
@@ -31,33 +35,38 @@ func (viewer *MarketViewer) Refresh() {
 	viewer.drawMarket()
 }
 
-func (viewer *MarketViewer) drawHeader() {
-	var cell *tview.TableCell
-	header := []string{
-		"Dow 30", "S&P 500", "Nasdaq", "Russell 2000",
-	}
-
-	for c := 0; c < len(header); c++ {
-		cell = tview.NewTableCell(header[c]).
-			SetTextColor(tcell.ColorYellow).
-			SetBackgroundColor(tcell.ColorDarkSlateGray).
-			SetAttributes(tcell.AttrBold).
-			SetAlign(tview.AlignCenter)
-
-		viewer.table.SetCell(0, c, cell)
-	}
-}
-
 func (viewer *MarketViewer) drawMarket() {
 	market := viewer.market
 
-	setQuantity(viewer.table, market.Dow.RegularMarketPrice, 1, 0, tview.AlignCenter, 0)
-	setQuantity(viewer.table, market.SP500.RegularMarketPrice, 1, 1, tview.AlignCenter, 0)
-	setQuantity(viewer.table, market.Nasdaq.RegularMarketPrice, 1, 2, tview.AlignCenter, 0)
-	setQuantity(viewer.table, market.Russell2000.RegularMarketPrice, 1, 3, tview.AlignCenter, 0)
+	viewer.drawIndex("Dow 30", market.Dow, 0)
+	viewer.drawIndex("S&P 500", market.SP500, 1)
+	viewer.drawIndex("Nasdaq", market.Nasdaq, 2)
+	viewer.drawIndex("Russell 2000", market.Russell2000, 3)
+}
 
-	setChangeAndPercent(viewer.table, market.Dow.RegularMarketChange, market.Dow.RegularMarketChangePercent, 2, 0, tview.AlignCenter, 0)
-	setChangeAndPercent(viewer.table, market.SP500.RegularMarketChange, market.Dow.RegularMarketChangePercent, 2, 1, tview.AlignCenter, 0)
-	setChangeAndPercent(viewer.table, market.Nasdaq.RegularMarketChange, market.Dow.RegularMarketChangePercent, 2, 2, tview.AlignCenter, 0)
-	setChangeAndPercent(viewer.table, market.Russell2000.RegularMarketChange, market.Dow.RegularMarketChangePercent, 2, 3, tview.AlignCenter, 0)
+func (viewer *MarketViewer) drawIndex(name string, index *finance.Index, c int) {
+	value := index.RegularMarketPrice
+	change := index.RegularMarketChange
+	percent := index.RegularMarketChangePercent
+
+	bg := tcell.ColorDarkGreen
+	formatter := "  +%.2f (+%.2f%%) "
+
+	if change < 0 {
+		bg = tcell.ColorDarkRed
+		formatter = "  -%.2f (-%.2f%%) "
+	}
+
+	cell := tview.NewTableCell(name).SetTextColor(tcell.ColorYellow).SetBackgroundColor(bg).SetAttributes(tcell.AttrBold).SetAlign(tview.AlignCenter)
+	viewer.table.SetCell(0, c, cell)
+
+	printer := message.NewPrinter(language.English)
+	dayValue := printer.Sprintf("%.2f", value)
+	cell = tview.NewTableCell(dayValue).SetTextColor(tcell.ColorWhite).SetBackgroundColor(bg).SetAlign(tview.AlignCenter).SetExpansion(0)
+	viewer.table.SetCell(1, c, cell)
+
+	printer = message.NewPrinter(language.English)
+	dayChange := printer.Sprintf(formatter, math.Abs(change), math.Abs(percent))
+	cell = tview.NewTableCell(dayChange).SetTextColor(tcell.ColorWhite).SetBackgroundColor(bg).SetAlign(tview.AlignCenter).SetExpansion(0)
+	viewer.table.SetCell(2, c, cell)
 }
