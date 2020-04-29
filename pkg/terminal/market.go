@@ -50,11 +50,11 @@ func (viewer *MarketViewer) drawIndex(name string, index *finance.Index, c int) 
 	percent := index.RegularMarketChangePercent
 
 	bg := tcell.ColorDarkGreen
-	formatter := "  +%.2f (+%.2f%%) "
+	formatter := " +%.2f (+%.2f%%)"
 
 	if change < 0 {
 		bg = tcell.ColorDarkRed
-		formatter = "  -%.2f (-%.2f%%) "
+		formatter = " -%.2f (-%.2f%%)"
 	}
 
 	cell := tview.NewTableCell(name).SetTextColor(tcell.ColorYellow).SetBackgroundColor(bg).SetAttributes(tcell.AttrBold).SetAlign(tview.AlignCenter)
@@ -62,11 +62,11 @@ func (viewer *MarketViewer) drawIndex(name string, index *finance.Index, c int) 
 
 	printer := message.NewPrinter(language.English)
 	dayValue := printer.Sprintf("%.2f", value)
-	cell = tview.NewTableCell(dayValue).SetTextColor(tcell.ColorWhite).SetBackgroundColor(bg).SetAlign(tview.AlignCenter).SetExpansion(0)
+	cell = tview.NewTableCell(dayValue).SetTextColor(tcell.ColorWhite).SetBackgroundColor(bg).SetAlign(tview.AlignCenter)
 	viewer.table.SetCell(1, c, cell)
 
 	printer = message.NewPrinter(language.English)
 	dayChange := printer.Sprintf(formatter, math.Abs(change), math.Abs(percent))
-	cell = tview.NewTableCell(dayChange).SetTextColor(tcell.ColorWhite).SetBackgroundColor(bg).SetAlign(tview.AlignCenter).SetExpansion(0)
+	cell = tview.NewTableCell(dayChange).SetTextColor(tcell.ColorWhite).SetBackgroundColor(bg).SetAlign(tview.AlignCenter)
 	viewer.table.SetCell(2, c, cell)
 }
