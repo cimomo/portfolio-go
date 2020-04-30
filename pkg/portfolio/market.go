@@ -11,6 +11,7 @@ const (
 	SP500       string = "^GSPC"
 	Nasdaq      string = "^IXIC"
 	Russell2000 string = "^RUT"
+	Foreign     string = "VXUS"
 )
 
 // Market defines the broader market indices we track
@@ -19,6 +20,7 @@ type Market struct {
 	SP500       *finance.Index
 	Nasdaq      *finance.Index
 	Russell2000 *finance.Index
+	Foreign     *finance.Index
 }
 
 // NewMarket returns a new market
@@ -48,10 +50,13 @@ func (market *Market) Refresh() error {
 		return err
 	}
 
+	foreign, err := index.Get(Foreign)
+
 	market.Dow = dow
 	market.SP500 = sp500
 	market.Nasdaq = nasdaq
 	market.Russell2000 = russell2000
+	market.Foreign = foreign
 
 	return nil
 }
