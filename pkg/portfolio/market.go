@@ -13,6 +13,7 @@ const (
 	Russell2000 string = "^RUT"
 	Foreign     string = "VXUS"
 	China       string = "000001.SS"
+	USBond      string = "BND"
 )
 
 // Market defines the broader market indices we track
@@ -23,6 +24,7 @@ type Market struct {
 	Russell2000 *finance.Index
 	Foreign     *finance.Index
 	China       *finance.Index
+	USBond      *finance.Index
 }
 
 // NewMarket returns a new market
@@ -62,12 +64,18 @@ func (market *Market) Refresh() error {
 		return err
 	}
 
+	bond, err := index.Get(USBond)
+	if err != nil {
+		return err
+	}
+
 	market.Dow = dow
 	market.SP500 = sp500
 	market.Nasdaq = nasdaq
 	market.Russell2000 = russell2000
 	market.Foreign = foreign
 	market.China = china
+	market.USBond = bond
 
 	return nil
 }
