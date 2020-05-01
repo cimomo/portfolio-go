@@ -14,6 +14,7 @@ const (
 	Foreign     string = "VXUS"
 	China       string = "000001.SS"
 	USBond      string = "BND"
+	Treasury10  string = "^TNX"
 )
 
 // Market defines the broader market indices we track
@@ -25,6 +26,7 @@ type Market struct {
 	Foreign     *finance.Index
 	China       *finance.Index
 	USBond      *finance.Index
+	Treasury10  *finance.Index
 }
 
 // NewMarket returns a new market
@@ -69,6 +71,11 @@ func (market *Market) Refresh() error {
 		return err
 	}
 
+	treasury10, err := index.Get(Treasury10)
+	if err != nil {
+		return err
+	}
+
 	market.Dow = dow
 	market.SP500 = sp500
 	market.Nasdaq = nasdaq
@@ -76,6 +83,7 @@ func (market *Market) Refresh() error {
 	market.Foreign = foreign
 	market.China = china
 	market.USBond = bond
+	market.Treasury10 = treasury10
 
 	return nil
 }
