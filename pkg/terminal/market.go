@@ -47,6 +47,7 @@ func (viewer *MarketViewer) drawMarket() {
 	viewer.drawIndex("US Bond", market.USBond, 6)
 	viewer.drawIndex("10-Yr Yield", market.Treasury10, 7)
 	viewer.drawIndex("Gold", market.Gold, 8)
+	viewer.drawIndex("Silver", market.Silver, 9)
 }
 
 func (viewer *MarketViewer) drawIndex(name string, index *finance.Index, c int) {

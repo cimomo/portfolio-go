@@ -16,6 +16,7 @@ const (
 	USBond      string = "BND"
 	Treasury10  string = "^TNX"
 	Gold        string = "GC=F"
+	Silver      string = "SI=F"
 )
 
 // Market defines the broader market indices we track
@@ -29,6 +30,7 @@ type Market struct {
 	USBond      *finance.Index
 	Treasury10  *finance.Index
 	Gold        *finance.Index
+	Silver      *finance.Index
 }
 
 // NewMarket returns a new market
@@ -83,6 +85,11 @@ func (market *Market) Refresh() error {
 		return err
 	}
 
+	silver, err := index.Get(Silver)
+	if err != nil {
+		return err
+	}
+
 	market.Dow = dow
 	market.SP500 = sp500
 	market.Nasdaq = nasdaq
@@ -92,6 +99,7 @@ func (market *Market) Refresh() error {
 	market.USBond = bond
 	market.Treasury10 = treasury10
 	market.Gold = gold
+	market.Silver = silver
 
 	return nil
 }
