@@ -18,6 +18,7 @@ const (
 	Gold        string = "GC=F"
 	Silver      string = "SI=F"
 	Oil         string = "CL=F"
+	Bitcoin     string = "BTC-USD"
 )
 
 // Market defines the broader market indices we track
@@ -33,6 +34,7 @@ type Market struct {
 	Gold        *finance.Index
 	Silver      *finance.Index
 	Oil         *finance.Index
+	Bitcoin     *finance.Index
 }
 
 // NewMarket returns a new market
@@ -97,6 +99,11 @@ func (market *Market) Refresh() error {
 		return err
 	}
 
+	bitcoin, err := index.Get(Bitcoin)
+	if err != nil {
+		return err
+	}
+
 	market.Dow = dow
 	market.SP500 = sp500
 	market.Nasdaq = nasdaq
@@ -108,6 +115,7 @@ func (market *Market) Refresh() error {
 	market.Gold = gold
 	market.Silver = silver
 	market.Oil = oil
+	market.Bitcoin = bitcoin
 
 	return nil
 }
