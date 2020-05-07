@@ -75,8 +75,8 @@ func (portfolio *Portfolio) Load(profile string) error {
 		portfolio.CostBasis += holdingConfig.CostBasis
 	}
 
-	if totalAllocation != 100.0 {
-		return errors.New("Total allocation should be 100%")
+	if totalAllocation != 100.0 && totalAllocation != 0.0 {
+		return errors.New("Total allocation should be either 0% (ignored) or 100%")
 	}
 
 	return nil
