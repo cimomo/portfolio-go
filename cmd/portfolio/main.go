@@ -12,14 +12,16 @@ func main() {
 	profile := flag.String("profile", "./examples/profile.yml", "(optional) Profile for portfolio")
 	flag.Parse()
 
-	p, err := loadPortfolio("Main", *profile)
+	port, err := loadPortfolio("Main", *profile)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	m := portfolio.NewMarket()
+	mkt := portfolio.NewMarket()
 
-	startTerminal(m, p)
+	perf := portfolio.NewPerformance(port)
+
+	startTerminal(mkt, port, perf)
 }
 
 func loadPortfolio(name string, profile string) (*portfolio.Portfolio, error) {
@@ -35,7 +37,7 @@ func loadPortfolio(name string, profile string) (*portfolio.Portfolio, error) {
 	return p, nil
 }
 
-func startTerminal(market *portfolio.Market, portfolio *portfolio.Portfolio) {
-	term := terminal.NewTerminal(market, portfolio)
+func startTerminal(market *portfolio.Market, portfolio *portfolio.Portfolio, performance *portfolio.Performance) {
+	term := terminal.NewTerminal(market, portfolio, performance)
 	term.Start()
 }
