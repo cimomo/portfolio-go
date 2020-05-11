@@ -21,6 +21,11 @@ func main() {
 
 	perf := portfolio.NewPerformance(port)
 
+	err = perf.Compute()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	startTerminal(mkt, port, perf)
 }
 
