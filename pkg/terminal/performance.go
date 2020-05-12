@@ -1,8 +1,6 @@
 package terminal
 
 import (
-	"time"
-
 	"github.com/cimomo/portfolio-go/pkg/portfolio"
 	"github.com/gdamore/tcell"
 	"github.com/rivo/tview"
@@ -53,5 +51,5 @@ func (viewer *PerformanceViewer) drawHeader() {
 
 func (viewer *PerformanceViewer) drawPerformance() {
 	setString(viewer.table, viewer.performance.Portfolio.Name, 1, 0, tcell.ColorWhite, tview.AlignLeft)
-	setString(viewer.table, viewer.performance.StartDate.Format(time.RFC3339), 1, 1, tcell.ColorWhite, tview.AlignRight)
+	setString(viewer.table, viewer.performance.StartDate.Format("2006-01-02"), 1, 1, tcell.ColorWhite, tview.AlignRight)
 }
