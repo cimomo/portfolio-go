@@ -1,6 +1,7 @@
 package portfolio
 
 import (
+	"errors"
 	"time"
 
 	"github.com/piquette/finance-go/chart"
@@ -122,5 +123,9 @@ func (performance *Performance) computeInitialBalance(startDate time.Time) (floa
 }
 
 func (performance *Performance) computeFinalBalance() (float64, error) {
+	if performance.Portfolio == nil || performance.Portfolio.Status == nil {
+		return 0, errors.New("Portfolio not initialized")
+	}
+
 	return performance.Portfolio.Status.Value, nil
 }

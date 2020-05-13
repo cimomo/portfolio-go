@@ -14,20 +14,15 @@ type PortfolioViewer struct {
 
 // NewPortfolioViewer returns a new viewer for the real-time portfolio data
 func NewPortfolioViewer(portfolio *portfolio.Portfolio) *PortfolioViewer {
-	viewer := PortfolioViewer{
+	return &PortfolioViewer{
 		portfolio: portfolio,
 		table:     tview.NewTable().SetBorders(false),
 	}
-
-	viewer.drawHeader()
-	viewer.Refresh()
-
-	return &viewer
 }
 
-// Refresh fetches the latest portfolio data and refreshes the viewer
-func (viewer *PortfolioViewer) Refresh() {
-	viewer.portfolio.Refresh()
+// Draw fetches the latest portfolio data and refreshes the viewer
+func (viewer *PortfolioViewer) Draw() {
+	viewer.drawHeader()
 	viewer.drawPortfolio()
 }
 

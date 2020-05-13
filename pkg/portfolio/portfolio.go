@@ -83,8 +83,12 @@ func (portfolio *Portfolio) Load(profile string) error {
 }
 
 // Refresh computes the current status of the entire portfolio and its holdings
-func (portfolio *Portfolio) Refresh() {
+func (portfolio *Portfolio) Refresh() error {
 	result := quote.List(portfolio.Symbols)
+
+	if result.Err() != nil {
+		return result.Err()
+	}
 
 	for result.Next() {
 		quote := result.Quote()
@@ -95,6 +99,8 @@ func (portfolio *Portfolio) Refresh() {
 	}
 
 	portfolio.RefreshStatus()
+
+	return nil
 }
 
 // RefreshStatus computes the current status of the entire portfolio

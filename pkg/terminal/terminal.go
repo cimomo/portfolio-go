@@ -29,7 +29,7 @@ func NewTerminal(market *portfolio.Market, portfolio *portfolio.Portfolio, perfo
 }
 
 // Start starts the terminal application
-func (term *Terminal) Start() {
+func (term *Terminal) Start() error {
 	portfolioViewer := NewPortfolioViewer(term.portfolio)
 	term.portfolioViewer = portfolioViewer
 
@@ -41,13 +41,47 @@ func (term *Terminal) Start() {
 
 	term.setLayout()
 
+	err := term.draw()
+	if err != nil {
+		return err
+	}
+
 	go term.refresh()
-	term.application.Run()
+
+	err = term.application.Run()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // Stop stops the terminal application
 func (term *Terminal) Stop() {
 	term.application.Stop()
+}
+
+func (term *Terminal) draw() error {
+	err := term.market.Refresh()
+	if err != nil {
+		return err
+	}
+
+	err = term.portfolio.Refresh()
+	if err != nil {
+		return err
+	}
+
+	err = term.performance.Compute()
+	if err != nil {
+		return err
+	}
+
+	term.portfolioViewer.Draw()
+	term.marketViewer.Draw()
+	term.performanceViewer.Draw()
+
+	return nil
 }
 
 func (term *Terminal) refresh() {
@@ -56,8 +90,7 @@ func (term *Terminal) refresh() {
 		select {
 		case <-ticker.C:
 			term.application.QueueUpdateDraw(func() {
-				term.portfolioViewer.Refresh()
-				term.marketViewer.Refresh()
+				term.draw()
 			})
 		}
 	}

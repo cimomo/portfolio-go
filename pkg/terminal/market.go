@@ -19,23 +19,14 @@ type MarketViewer struct {
 
 // NewMarketViewer returns a new viewer for the real-time market data
 func NewMarketViewer(market *portfolio.Market) *MarketViewer {
-	viewer := MarketViewer{
+	return &MarketViewer{
 		market: market,
 		table:  tview.NewTable().SetBorders(false).SetSeparator(' '),
 	}
-
-	viewer.Refresh()
-
-	return &viewer
 }
 
-// Refresh fetches the latest market data and refreshes the viewer
-func (viewer *MarketViewer) Refresh() {
-	viewer.market.Refresh()
-	viewer.drawMarket()
-}
-
-func (viewer *MarketViewer) drawMarket() {
+// Draw fetches the latest market data and refreshes the viewer
+func (viewer *MarketViewer) Draw() {
 	market := viewer.market
 
 	viewer.drawIndex("Dow 30", market.Dow, 0)

@@ -14,17 +14,14 @@ type PerformanceViewer struct {
 
 // NewPerformanceViewer returns a new viewer for the historic performance of a portfolio
 func NewPerformanceViewer(performance *portfolio.Performance) *PerformanceViewer {
-	viewer := PerformanceViewer{
+	return &PerformanceViewer{
 		performance: performance,
 		table:       tview.NewTable().SetBorders(true),
 	}
-
-	viewer.draw()
-
-	return &viewer
 }
 
-func (viewer *PerformanceViewer) draw() {
+// Draw calculates the portfolio performance and refreshes the viewer
+func (viewer *PerformanceViewer) Draw() {
 	viewer.drawHeader()
 	viewer.drawPerformance()
 }
