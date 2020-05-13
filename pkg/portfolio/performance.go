@@ -45,6 +45,13 @@ func (performance *Performance) Compute() error {
 
 	performance.InitialBalance = initialBalance
 
+	finalBalance, err := performance.computeFinalBalance()
+	if err != nil {
+		return err
+	}
+
+	performance.FinalBalance = finalBalance
+
 	return nil
 }
 
@@ -112,4 +119,8 @@ func (performance *Performance) computeInitialBalance(startDate time.Time) (floa
 	}
 
 	return initialBalance, nil
+}
+
+func (performance *Performance) computeFinalBalance() (float64, error) {
+	return performance.Portfolio.Status.Value, nil
 }

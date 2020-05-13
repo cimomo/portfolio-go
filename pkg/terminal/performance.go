@@ -53,4 +53,5 @@ func (viewer *PerformanceViewer) drawPerformance() {
 	setString(viewer.table, viewer.performance.Portfolio.Name, 1, 0, tcell.ColorWhite, tview.AlignLeft)
 	setString(viewer.table, viewer.performance.StartDate.Format("2006-01-02"), 1, 1, tcell.ColorWhite, tview.AlignRight)
 	setDollarAmount(viewer.table, viewer.performance.InitialBalance, 1, 2, tcell.ColorWhite)
+	setDollarAmount(viewer.table, viewer.performance.FinalBalance, 1, 3, tcell.ColorWhite)
 }
