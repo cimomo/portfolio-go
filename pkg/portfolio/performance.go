@@ -31,17 +31,24 @@ func NewPerformance(portfolio *Portfolio) *Performance {
 
 // Compute generates the performance data for the portfolio
 func (performance *Performance) Compute() error {
-	startDate, err := performance.getStartDateForPortfolio()
+	startDate, err := performance.computeStartDateForPortfolio()
 	if err != nil {
 		return err
 	}
 
 	performance.StartDate = startDate
 
+	initialBalance, err := performance.computeInitialBalance(startDate)
+	if err != nil {
+		return err
+	}
+
+	performance.InitialBalance = initialBalance
+
 	return nil
 }
 
-func (performance *Performance) getStartDateForPortfolio() (time.Time, error) {
+func (performance *Performance) computeStartDateForPortfolio() (time.Time, error) {
 	now := time.Now()
 	thisYear := now.Year()
 	startYear := thisYear - 9
@@ -54,7 +61,7 @@ func (performance *Performance) getStartDateForPortfolio() (time.Time, error) {
 	startDate := earliest
 
 	for _, symbol := range performance.Portfolio.Symbols {
-		start, err := performance.getStartDateForAsset(earliest, symbol)
+		start, err := performance.computeStartDateForAsset(earliest, symbol)
 		if err != nil {
 			return time.Time{}, err
 		}
@@ -67,7 +74,7 @@ func (performance *Performance) getStartDateForPortfolio() (time.Time, error) {
 	return startDate, nil
 }
 
-func (performance *Performance) getStartDateForAsset(earliest time.Time, symbol string) (time.Time, error) {
+func (performance *Performance) computeStartDateForAsset(earliest time.Time, symbol string) (time.Time, error) {
 	ny, err := time.LoadLocation("America/New_York")
 	if err != nil {
 		return time.Time{}, err
@@ -78,7 +85,7 @@ func (performance *Performance) getStartDateForAsset(earliest time.Time, symbol 
 		Symbol:   symbol,
 		Start:    datetime.New(&earliest),
 		End:      datetime.New(&now),
-		Interval: datetime.OneMonth,
+		Interval: datetime.OneDay,
 	}
 
 	iter := chart.Get(p)
@@ -89,4 +96,20 @@ func (performance *Performance) getStartDateForAsset(earliest time.Time, symbol 
 	}
 
 	return time.Time{}, iter.Err()
+}
+
+func (performance *Performance) computeInitialBalance(startDate time.Time) (float64, error) {
+	var initialBalance float64
+
+	for _, holding := range performance.Portfolio.Holdings {
+		bar, err := holding.GetHistoricalQuote(startDate)
+		if err != nil {
+			return 0, err
+		}
+
+		adjClose, _ := bar.AdjClose.Float64()
+		initialBalance += adjClose * holding.Quantity
+	}
+
+	return initialBalance, nil
 }

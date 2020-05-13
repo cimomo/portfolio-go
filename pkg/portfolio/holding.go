@@ -1,7 +1,11 @@
 package portfolio
 
 import (
+	"time"
+
 	"github.com/piquette/finance-go"
+	"github.com/piquette/finance-go/chart"
+	"github.com/piquette/finance-go/datetime"
 	"github.com/piquette/finance-go/quote"
 )
 
@@ -69,4 +73,23 @@ func (holding *Holding) RefreshStatus() {
 	}
 
 	holding.Status = &status
+}
+
+// GetHistoricalQuote returns the quote on a specific day
+func (holding *Holding) GetHistoricalQuote(date time.Time) (*finance.ChartBar, error) {
+	p := &chart.Params{
+		Symbol:   holding.Asset.Symbol,
+		Start:    datetime.New(&date),
+		End:      datetime.New(&date),
+		Interval: datetime.OneDay,
+	}
+
+	iter := chart.Get(p)
+
+	for iter.Next() {
+		b := iter.Bar()
+		return b, nil
+	}
+
+	return nil, iter.Err()
 }
