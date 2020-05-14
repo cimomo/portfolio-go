@@ -47,6 +47,11 @@ func (viewer *PerformanceViewer) drawHeader() {
 }
 
 func (viewer *PerformanceViewer) drawPerformance() {
+	if viewer.performance.StartDate.IsZero() {
+		setString(viewer.table, "Computing ...", 1, 0, tcell.ColorWhite, tview.AlignLeft)
+		return
+	}
+
 	setString(viewer.table, viewer.performance.Portfolio.Name, 1, 0, tcell.ColorWhite, tview.AlignLeft)
 	setString(viewer.table, viewer.performance.StartDate.Format("2006-01-02"), 1, 1, tcell.ColorWhite, tview.AlignRight)
 	setDollarAmount(viewer.table, viewer.performance.InitialBalance, 1, 2, tcell.ColorWhite)

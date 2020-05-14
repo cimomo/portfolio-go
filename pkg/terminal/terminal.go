@@ -46,6 +46,13 @@ func (term *Terminal) Start() error {
 		return err
 	}
 
+	// The performance has not been computed yet. However, that's handled by the viewer
+	term.performanceViewer.Draw()
+
+	// This will lazily compute the performance and update the viewer
+	go term.showPerformance()
+
+	// Periodically refresh the market and portfolio data
 	go term.refresh()
 
 	err = term.application.Run()
@@ -72,13 +79,18 @@ func (term *Terminal) draw() error {
 		return err
 	}
 
-	err = term.performance.Compute()
+	term.portfolioViewer.Draw()
+	term.marketViewer.Draw()
+
+	return nil
+}
+
+func (term *Terminal) drawPerformance() error {
+	err := term.performance.Compute()
 	if err != nil {
 		return err
 	}
 
-	term.portfolioViewer.Draw()
-	term.marketViewer.Draw()
 	term.performanceViewer.Draw()
 
 	return nil
@@ -94,6 +106,12 @@ func (term *Terminal) refresh() {
 			})
 		}
 	}
+}
+
+func (term *Terminal) showPerformance() {
+	term.application.QueueUpdateDraw(func() {
+		term.drawPerformance()
+	})
 }
 
 func (term *Terminal) setLayout() {
