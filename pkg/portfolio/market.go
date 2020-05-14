@@ -1,6 +1,8 @@
 package portfolio
 
 import (
+	"fmt"
+
 	"github.com/piquette/finance-go"
 	"github.com/piquette/finance-go/index"
 )
@@ -44,78 +46,48 @@ func NewMarket() *Market {
 
 // Refresh fetches the latest quotes for the market indices
 func (market *Market) Refresh() error {
-	dow, err := index.Get(Dow)
-	if err != nil {
-		return err
+	indices := []string{
+		Dow, SP500, Nasdaq, Russell2000, Foreign, China, USBond, Treasury10, Gold, Silver, Oil, Bitcoin,
 	}
 
-	sp500, err := index.Get(SP500)
-	if err != nil {
-		return err
+	result := index.List(indices)
+
+	if result.Err() != nil {
+		return result.Err()
 	}
 
-	nasdaq, err := index.Get(Nasdaq)
-	if err != nil {
-		return err
-	}
+	for result.Next() {
+		index := result.Index()
 
-	russell2000, err := index.Get(Russell2000)
-	if err != nil {
-		return err
+		switch index.Symbol {
+		case Dow:
+			market.Dow = index
+		case SP500:
+			market.SP500 = index
+		case Nasdaq:
+			market.Nasdaq = index
+		case Russell2000:
+			market.Russell2000 = index
+		case Foreign:
+			market.Foreign = index
+		case China:
+			market.China = index
+		case USBond:
+			market.USBond = index
+		case Treasury10:
+			market.Treasury10 = index
+		case Gold:
+			market.Gold = index
+		case Silver:
+			market.Silver = index
+		case Oil:
+			market.Oil = index
+		case Bitcoin:
+			market.Bitcoin = index
+		default:
+			return fmt.Errorf("Unknown symbol: %s", index.Symbol)
+		}
 	}
-
-	foreign, err := index.Get(Foreign)
-	if err != nil {
-		return err
-	}
-
-	china, err := index.Get(China)
-	if err != nil {
-		return err
-	}
-
-	bond, err := index.Get(USBond)
-	if err != nil {
-		return err
-	}
-
-	treasury10, err := index.Get(Treasury10)
-	if err != nil {
-		return err
-	}
-
-	gold, err := index.Get(Gold)
-	if err != nil {
-		return err
-	}
-
-	silver, err := index.Get(Silver)
-	if err != nil {
-		return err
-	}
-
-	oil, err := index.Get(Oil)
-	if err != nil {
-		return err
-	}
-
-	bitcoin, err := index.Get(Bitcoin)
-	if err != nil {
-		return err
-	}
-
-	market.Dow = dow
-	market.SP500 = sp500
-	market.Nasdaq = nasdaq
-	market.Russell2000 = russell2000
-	market.Foreign = foreign
-	market.China = china
-	market.USBond = bond
-	market.Treasury10 = treasury10
-	market.Gold = gold
-	market.Silver = silver
-	market.Oil = oil
-	market.Bitcoin = bitcoin
 
 	return nil
 }
