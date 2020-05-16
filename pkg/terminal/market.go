@@ -44,6 +44,11 @@ func (viewer *MarketViewer) Draw() {
 }
 
 func (viewer *MarketViewer) drawIndex(name string, index *finance.Index, c int) {
+	if index == nil {
+		viewer.drawBlankIndex(name, c)
+		return
+	}
+
 	value := index.RegularMarketPrice
 	change := index.RegularMarketChange
 	percent := index.RegularMarketChangePercent
@@ -67,5 +72,16 @@ func (viewer *MarketViewer) drawIndex(name string, index *finance.Index, c int) 
 	printer = message.NewPrinter(language.English)
 	dayChange := printer.Sprintf(formatter, math.Abs(change), math.Abs(percent))
 	cell = tview.NewTableCell(dayChange).SetTextColor(tcell.ColorWhite).SetBackgroundColor(bg).SetAlign(tview.AlignCenter)
+	viewer.table.SetCell(2, c, cell)
+}
+
+func (viewer *MarketViewer) drawBlankIndex(name string, c int) {
+	bg := tcell.ColorDarkGreen
+
+	cell := tview.NewTableCell(name).SetTextColor(tcell.ColorYellow).SetBackgroundColor(bg).SetAttributes(tcell.AttrBold).SetAlign(tview.AlignCenter)
+	viewer.table.SetCell(0, c, cell)
+
+	cell = tview.NewTableCell("-").SetTextColor(tcell.ColorWhite).SetBackgroundColor(bg).SetAlign(tview.AlignCenter)
+	viewer.table.SetCell(1, c, cell)
 	viewer.table.SetCell(2, c, cell)
 }
