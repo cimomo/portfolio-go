@@ -2,6 +2,7 @@ package portfolio
 
 import (
 	"errors"
+	"math"
 	"time"
 
 	"github.com/piquette/finance-go/chart"
@@ -52,6 +53,13 @@ func (performance *Performance) Compute() error {
 	}
 
 	performance.FinalBalance = finalBalance
+
+	cagr, err := performance.computeCAGR()
+	if err != nil {
+		return err
+	}
+
+	performance.CAGR = cagr
 
 	return nil
 }
@@ -128,4 +136,22 @@ func (performance *Performance) computeFinalBalance() (float64, error) {
 	}
 
 	return performance.Portfolio.Status.Value, nil
+}
+
+func (performance *Performance) computeCAGR() (float64, error) {
+	ny, err := time.LoadLocation("America/New_York")
+	if err != nil {
+		return 0, err
+	}
+
+	now := time.Now().In(ny)
+	start := performance.StartDate
+
+	duration := now.Sub(start)
+	hours := duration.Hours()
+	years := hours / 24 / 365
+
+	cagr := math.Pow(performance.FinalBalance/performance.InitialBalance, 1/years) - 1
+
+	return cagr, nil
 }
