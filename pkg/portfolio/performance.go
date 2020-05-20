@@ -41,14 +41,14 @@ func NewPerformance(portfolio *Portfolio) *Performance {
 
 // Compute generates the performance data for the portfolio
 func (performance *Performance) Compute() error {
-	startDate, err := performance.computeStartDateForPortfolio()
+	startDate, err := computeStartDateForPortfolio(performance.Portfolio)
 	if err != nil {
 		return err
 	}
 
 	performance.StartDate = startDate
 
-	monthly, err := performance.computeMonthlyBalances()
+	monthly, err := computeMonthlyBalances(performance.Portfolio, performance.StartDate)
 	if err != nil {
 		return err
 	}
@@ -57,7 +57,7 @@ func (performance *Performance) Compute() error {
 	performance.InitialBalance = monthly[0].Open
 	performance.FinalBalance = monthly[len(monthly)-1].Close
 
-	cagr, err := performance.computeCAGR()
+	cagr, err := computeCAGR(performance.StartDate, performance.InitialBalance, performance.FinalBalance)
 	if err != nil {
 		return err
 	}
@@ -67,7 +67,7 @@ func (performance *Performance) Compute() error {
 	return nil
 }
 
-func (performance *Performance) computeStartDateForPortfolio() (time.Time, error) {
+func computeStartDateForPortfolio(portfolio *Portfolio) (time.Time, error) {
 	now := time.Now()
 	thisYear := now.Year()
 	startYear := thisYear - 10
@@ -79,8 +79,8 @@ func (performance *Performance) computeStartDateForPortfolio() (time.Time, error
 	earliest := *earliestDate.Time()
 	startDate := earliest
 
-	for _, symbol := range performance.Portfolio.Symbols {
-		start, err := performance.computeStartDateForAsset(earliest, symbol)
+	for _, symbol := range portfolio.Symbols {
+		start, err := computeStartDateForAsset(earliest, symbol)
 		if err != nil {
 			return time.Time{}, err
 		}
@@ -93,7 +93,7 @@ func (performance *Performance) computeStartDateForPortfolio() (time.Time, error
 	return startDate, nil
 }
 
-func (performance *Performance) computeStartDateForAsset(earliest time.Time, symbol string) (time.Time, error) {
+func computeStartDateForAsset(earliest time.Time, symbol string) (time.Time, error) {
 	ny, err := time.LoadLocation("America/New_York")
 	if err != nil {
 		return time.Time{}, err
@@ -117,25 +117,24 @@ func (performance *Performance) computeStartDateForAsset(earliest time.Time, sym
 	return time.Time{}, iter.Err()
 }
 
-func (performance *Performance) computeCAGR() (float64, error) {
+func computeCAGR(startDate time.Time, initialBalance float64, finalBalance float64) (float64, error) {
 	ny, err := time.LoadLocation("America/New_York")
 	if err != nil {
 		return 0, err
 	}
 
 	now := time.Now().In(ny)
-	start := performance.StartDate
 
-	duration := now.Sub(start)
+	duration := now.Sub(startDate)
 	hours := duration.Hours()
 	years := hours / 24 / 365
 
-	cagr := math.Pow(performance.FinalBalance/performance.InitialBalance, 1/years) - 1
+	cagr := math.Pow(finalBalance/initialBalance, 1/years) - 1
 
 	return cagr, nil
 }
 
-func (performance *Performance) computeMonthlyBalancesForAsset(symbol string) ([]finance.ChartBar, error) {
+func computeMonthlyBalancesForAsset(symbol string, startDate time.Time) ([]finance.ChartBar, error) {
 	monthly := make([]finance.ChartBar, 0)
 
 	ny, err := time.LoadLocation("America/New_York")
@@ -147,7 +146,7 @@ func (performance *Performance) computeMonthlyBalancesForAsset(symbol string) ([
 
 	p := &chart.Params{
 		Symbol:   symbol,
-		Start:    datetime.New(&performance.StartDate),
+		Start:    datetime.New(&startDate),
 		End:      datetime.New(&now),
 		Interval: datetime.OneMonth,
 	}
@@ -165,7 +164,7 @@ func (performance *Performance) computeMonthlyBalancesForAsset(symbol string) ([
 	return monthly, nil
 }
 
-func (performance *Performance) computeMonthlyBalances() ([]Historic, error) {
+func computeMonthlyBalances(portfolio *Portfolio, startDate time.Time) ([]Historic, error) {
 	var monthly []Historic
 
 	ny, err := time.LoadLocation("America/New_York")
@@ -173,9 +172,9 @@ func (performance *Performance) computeMonthlyBalances() ([]Historic, error) {
 		return nil, err
 	}
 
-	for _, symbol := range performance.Portfolio.Symbols {
-		holding := performance.Portfolio.Holdings[symbol]
-		monthlyForAsset, err := performance.computeMonthlyBalancesForAsset(symbol)
+	for _, symbol := range portfolio.Symbols {
+		holding := portfolio.Holdings[symbol]
+		monthlyForAsset, err := computeMonthlyBalancesForAsset(symbol, startDate)
 		if err != nil {
 			return nil, err
 		}
