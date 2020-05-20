@@ -15,6 +15,7 @@ type Performance struct {
 	StartDate           time.Time
 	InitialBalance      float64
 	FinalBalance        float64
+	MonthlyBalances     []float64
 	CAGR                float64
 	Stdev               float64
 	BestYear            float64
@@ -60,6 +61,13 @@ func (performance *Performance) Compute() error {
 	}
 
 	performance.CAGR = cagr
+
+	monthly, err := performance.computeMonthlyBalances()
+	if err != nil {
+		return err
+	}
+
+	performance.MonthlyBalances = monthly
 
 	return nil
 }
@@ -154,4 +162,57 @@ func (performance *Performance) computeCAGR() (float64, error) {
 	cagr := math.Pow(performance.FinalBalance/performance.InitialBalance, 1/years) - 1
 
 	return cagr, nil
+}
+
+func (performance *Performance) computeMonthlyBalancesForAsset(symbol string) ([]float64, error) {
+	monthly := make([]float64, 10)
+
+	ny, err := time.LoadLocation("America/New_York")
+	if err != nil {
+		return nil, err
+	}
+
+	now := time.Now().In(ny)
+
+	p := &chart.Params{
+		Symbol:   symbol,
+		Start:    datetime.New(&performance.StartDate),
+		End:      datetime.New(&now),
+		Interval: datetime.OneMonth,
+	}
+
+	iter := chart.Get(p)
+	if iter.Err() != nil {
+		return nil, err
+	}
+
+	for iter.Next() {
+		b := iter.Bar()
+		adjClose, _ := b.AdjClose.Float64()
+		monthly = append(monthly, adjClose)
+	}
+
+	return monthly, nil
+}
+
+func (performance *Performance) computeMonthlyBalances() ([]float64, error) {
+	var monthly []float64
+
+	for _, symbol := range performance.Portfolio.Symbols {
+		holding := performance.Portfolio.Holdings[symbol]
+		monthlyForAsset, err := performance.computeMonthlyBalancesForAsset(symbol)
+		if err != nil {
+			return nil, err
+		}
+
+		if monthly == nil {
+			monthly = make([]float64, len(monthlyForAsset))
+		}
+
+		for i := range monthlyForAsset {
+			monthly[i] += monthlyForAsset[i] * holding.Quantity
+		}
+	}
+
+	return monthly, nil
 }
