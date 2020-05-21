@@ -13,7 +13,7 @@ import (
 type Performance struct {
 	Portfolio           *Portfolio
 	StartDate           time.Time
-	MonthlyBalances     []Historic
+	Historic            []Historic
 	InitialBalance      float64
 	FinalBalance        float64
 	CAGR                float64
@@ -53,7 +53,7 @@ func (performance *Performance) Compute() error {
 		return err
 	}
 
-	performance.MonthlyBalances = monthly
+	performance.Historic = monthly
 	performance.InitialBalance = monthly[0].Open
 	performance.FinalBalance = monthly[len(monthly)-1].Close
 
@@ -63,6 +63,10 @@ func (performance *Performance) Compute() error {
 	}
 
 	performance.CAGR = cagr
+
+	sd := computeStandardDeviation(performance.Historic)
+
+	performance.Stdev = sd
 
 	return nil
 }
@@ -195,4 +199,40 @@ func computeMonthlyBalances(portfolio *Portfolio, startDate time.Time) ([]Histor
 	}
 
 	return monthly, nil
+}
+
+func computeStandardDeviation(historic []Historic) float64 {
+	returns := computeMonthlyReturns(historic)
+
+	var sum, mean, sd float64
+	n := float64(len(returns))
+
+	for _, r := range returns {
+		sum += r
+	}
+
+	mean = sum / n
+
+	for _, r := range returns {
+		sd += math.Pow(r-mean, 2)
+	}
+
+	// Annualized standard deviation of monthly returns
+	sd = math.Sqrt(sd/n) * math.Sqrt(12)
+
+	return sd
+}
+
+func computeMonthlyReturns(historic []Historic) []float64 {
+	returns := make([]float64, len(historic))
+
+	for i, month := range historic {
+		if i == 0 {
+			returns[i] = ((month.Close - month.Open) / month.Open) * 100
+		} else {
+			returns[i] = ((historic[i].Close - historic[i-1].Close) / historic[i-1].Close) * 100
+		}
+	}
+
+	return returns
 }
