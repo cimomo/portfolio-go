@@ -133,7 +133,7 @@ func computeCAGR(startDate time.Time, endDate time.Time, initialBalance float64,
 	hours := duration.Hours()
 	years := hours / 24 / 365
 
-	cagr := math.Pow(finalBalance/initialBalance, 1/years) - 1
+	cagr := (math.Pow(finalBalance/initialBalance, 1/years) - 1) * 100
 
 	return cagr, nil
 }
