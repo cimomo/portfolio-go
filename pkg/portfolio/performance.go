@@ -13,6 +13,7 @@ import (
 type Performance struct {
 	Portfolio           *Portfolio
 	StartDate           time.Time
+	EndDate             time.Time
 	Historic            []Historic
 	InitialBalance      float64
 	FinalBalance        float64
@@ -41,14 +42,15 @@ func NewPerformance(portfolio *Portfolio) *Performance {
 
 // Compute generates the performance data for the portfolio
 func (performance *Performance) Compute() error {
-	startDate, err := computeStartDateForPortfolio(performance.Portfolio)
+	startDate, endDate, err := computeStartAndEndDateForPortfolio(performance.Portfolio)
 	if err != nil {
 		return err
 	}
 
 	performance.StartDate = startDate
+	performance.EndDate = endDate
 
-	monthly, err := computeMonthlyBalances(performance.Portfolio, performance.StartDate)
+	monthly, err := computeMonthlyBalances(performance.Portfolio, performance.StartDate, performance.EndDate)
 	if err != nil {
 		return err
 	}
@@ -57,7 +59,7 @@ func (performance *Performance) Compute() error {
 	performance.InitialBalance = monthly[0].Open
 	performance.FinalBalance = monthly[len(monthly)-1].Close
 
-	cagr, err := computeCAGR(performance.StartDate, performance.InitialBalance, performance.FinalBalance)
+	cagr, err := computeCAGR(performance.StartDate, performance.EndDate, performance.InitialBalance, performance.FinalBalance)
 	if err != nil {
 		return err
 	}
@@ -68,11 +70,22 @@ func (performance *Performance) Compute() error {
 
 	performance.Stdev = sd
 
+	yearly := computeYearlyReturns(performance.Historic, performance.StartDate, performance.EndDate)
+	best, worst := computeBestAndWorstYears(yearly)
+
+	performance.BestYear = best
+	performance.WorstYear = worst
+
 	return nil
 }
 
-func computeStartDateForPortfolio(portfolio *Portfolio) (time.Time, error) {
-	now := time.Now()
+func computeStartAndEndDateForPortfolio(portfolio *Portfolio) (time.Time, time.Time, error) {
+	ny, err := time.LoadLocation("America/New_York")
+	if err != nil {
+		return time.Time{}, time.Time{}, err
+	}
+
+	now := time.Now().In(ny)
 	thisYear := now.Year()
 	startYear := thisYear - 10
 	earliestDate := &datetime.Datetime{
@@ -84,9 +97,9 @@ func computeStartDateForPortfolio(portfolio *Portfolio) (time.Time, error) {
 	startDate := earliest
 
 	for _, symbol := range portfolio.Symbols {
-		start, err := computeStartDateForAsset(earliest, symbol)
+		start, err := computeStartDateForAsset(earliest, now, symbol)
 		if err != nil {
-			return time.Time{}, err
+			return time.Time{}, time.Time{}, err
 		}
 
 		if (start).After(startDate) {
@@ -94,42 +107,29 @@ func computeStartDateForPortfolio(portfolio *Portfolio) (time.Time, error) {
 		}
 	}
 
-	return startDate, nil
+	return startDate, now, nil
 }
 
-func computeStartDateForAsset(earliest time.Time, symbol string) (time.Time, error) {
-	ny, err := time.LoadLocation("America/New_York")
-	if err != nil {
-		return time.Time{}, err
-	}
-
-	now := time.Now().In(ny)
+func computeStartDateForAsset(earliest time.Time, endDate time.Time, symbol string) (time.Time, error) {
 	p := &chart.Params{
 		Symbol:   symbol,
 		Start:    datetime.New(&earliest),
-		End:      datetime.New(&now),
+		End:      datetime.New(&endDate),
 		Interval: datetime.OneDay,
 	}
 
 	iter := chart.Get(p)
 	for iter.Next() {
 		b := iter.Bar()
-		startDate := time.Unix(int64(b.Timestamp), 0).In(ny)
+		startDate := time.Unix(int64(b.Timestamp), 0).In(earliest.Location())
 		return startDate, nil
 	}
 
 	return time.Time{}, iter.Err()
 }
 
-func computeCAGR(startDate time.Time, initialBalance float64, finalBalance float64) (float64, error) {
-	ny, err := time.LoadLocation("America/New_York")
-	if err != nil {
-		return 0, err
-	}
-
-	now := time.Now().In(ny)
-
-	duration := now.Sub(startDate)
+func computeCAGR(startDate time.Time, endDate time.Time, initialBalance float64, finalBalance float64) (float64, error) {
+	duration := endDate.Sub(startDate)
 	hours := duration.Hours()
 	years := hours / 24 / 365
 
@@ -138,26 +138,19 @@ func computeCAGR(startDate time.Time, initialBalance float64, finalBalance float
 	return cagr, nil
 }
 
-func computeMonthlyBalancesForAsset(symbol string, startDate time.Time) ([]finance.ChartBar, error) {
+func computeMonthlyBalancesForAsset(symbol string, startDate time.Time, endDate time.Time) ([]finance.ChartBar, error) {
 	monthly := make([]finance.ChartBar, 0)
-
-	ny, err := time.LoadLocation("America/New_York")
-	if err != nil {
-		return nil, err
-	}
-
-	now := time.Now().In(ny)
 
 	p := &chart.Params{
 		Symbol:   symbol,
 		Start:    datetime.New(&startDate),
-		End:      datetime.New(&now),
+		End:      datetime.New(&endDate),
 		Interval: datetime.OneMonth,
 	}
 
 	iter := chart.Get(p)
 	if iter.Err() != nil {
-		return nil, err
+		return nil, iter.Err()
 	}
 
 	for iter.Next() {
@@ -168,17 +161,12 @@ func computeMonthlyBalancesForAsset(symbol string, startDate time.Time) ([]finan
 	return monthly, nil
 }
 
-func computeMonthlyBalances(portfolio *Portfolio, startDate time.Time) ([]Historic, error) {
+func computeMonthlyBalances(portfolio *Portfolio, startDate time.Time, endDate time.Time) ([]Historic, error) {
 	var monthly []Historic
-
-	ny, err := time.LoadLocation("America/New_York")
-	if err != nil {
-		return nil, err
-	}
 
 	for _, symbol := range portfolio.Symbols {
 		holding := portfolio.Holdings[symbol]
-		monthlyForAsset, err := computeMonthlyBalancesForAsset(symbol, startDate)
+		monthlyForAsset, err := computeMonthlyBalancesForAsset(symbol, startDate, endDate)
 		if err != nil {
 			return nil, err
 		}
@@ -194,7 +182,7 @@ func computeMonthlyBalances(portfolio *Portfolio, startDate time.Time) ([]Histor
 			close, _ := monthlyForAsset[i].AdjClose.Float64()
 			monthly[i].Close += close * holding.Quantity
 
-			monthly[i].Date = time.Unix(int64(monthlyForAsset[i].Timestamp), 0).In(ny)
+			monthly[i].Date = time.Unix(int64(monthlyForAsset[i].Timestamp), 0).In(startDate.Location())
 		}
 	}
 
@@ -235,4 +223,41 @@ func computeMonthlyReturns(historic []Historic) []float64 {
 	}
 
 	return returns
+}
+
+func computeYearlyReturns(historic []Historic, startDate time.Time, endDate time.Time) []float64 {
+	startYear := startDate.Year()
+	endYear := endDate.Year()
+	years := endYear - startYear + 1
+
+	returns := make([]float64, years)
+
+	lastClose := historic[0].Open
+	curr := 0
+
+	for _, month := range historic {
+		currYear := startYear + curr
+		if month.Date.Year() == currYear && month.Date.Month() == time.December {
+			returns[curr] = ((month.Close - lastClose) / lastClose) * 100
+			lastClose = month.Close
+			curr++
+		}
+	}
+
+	returns[years-1] = ((historic[len(historic)-1].Close - lastClose) / lastClose) * 100
+
+	return returns
+}
+
+func computeBestAndWorstYears(yearlyReturns []float64) (float64, float64) {
+	var best, worst float64
+	for _, yearly := range yearlyReturns {
+		if yearly > best {
+			best = yearly
+		} else if yearly < worst {
+			worst = yearly
+		}
+	}
+
+	return best, worst
 }

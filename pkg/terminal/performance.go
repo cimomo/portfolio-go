@@ -58,4 +58,6 @@ func (viewer *PerformanceViewer) drawPerformance() {
 	setDollarAmount(viewer.table, viewer.performance.FinalBalance, 1, 3, tcell.ColorWhite)
 	setPercentChange(viewer.table, viewer.performance.CAGR*100, 1, 4)
 	setPercent(viewer.table, viewer.performance.Stdev, 1, 5, tcell.ColorWhite)
+	setPercentChange(viewer.table, viewer.performance.BestYear, 1, 6)
+	setPercentChange(viewer.table, viewer.performance.WorstYear, 1, 7)
 }
