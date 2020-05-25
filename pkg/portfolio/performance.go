@@ -46,7 +46,6 @@ func (performance *Performance) Compute() error {
 	if err != nil {
 		return err
 	}
-
 	performance.StartDate = startDate
 	performance.EndDate = endDate
 
@@ -54,7 +53,6 @@ func (performance *Performance) Compute() error {
 	if err != nil {
 		return err
 	}
-
 	performance.Historic = monthly
 	performance.InitialBalance = monthly[0].Open
 	performance.FinalBalance = monthly[len(monthly)-1].Close
@@ -63,16 +61,18 @@ func (performance *Performance) Compute() error {
 	if err != nil {
 		return err
 	}
-
 	performance.CAGR = cagr
 
-	sd := computeStandardDeviation(performance.Historic)
+	monthlyReturns := computeMonthlyReturns(performance.Historic)
 
+	sd := computeStandardDeviation(monthlyReturns)
 	performance.Stdev = sd
+
+	maxDrawdown := computeMaxDrawdown(monthlyReturns)
+	performance.MaxDrawdown = maxDrawdown
 
 	yearly := computeYearlyReturns(performance.Historic, performance.StartDate, performance.EndDate)
 	best, worst := computeBestAndWorstYears(yearly)
-
 	performance.BestYear = best
 	performance.WorstYear = worst
 
@@ -189,19 +189,17 @@ func computeMonthlyBalances(portfolio *Portfolio, startDate time.Time, endDate t
 	return monthly, nil
 }
 
-func computeStandardDeviation(historic []Historic) float64 {
-	returns := computeMonthlyReturns(historic)
-
+func computeStandardDeviation(monthlyReturns []float64) float64 {
 	var sum, mean, sd float64
-	n := float64(len(returns))
+	n := float64(len(monthlyReturns))
 
-	for _, r := range returns {
+	for _, r := range monthlyReturns {
 		sum += r
 	}
 
 	mean = sum / n
 
-	for _, r := range returns {
+	for _, r := range monthlyReturns {
 		sd += math.Pow(r-mean, 2)
 	}
 
@@ -260,4 +258,16 @@ func computeBestAndWorstYears(yearlyReturns []float64) (float64, float64) {
 	}
 
 	return best, worst
+}
+
+func computeMaxDrawdown(monthlyReturns []float64) float64 {
+	var maxDrawdown float64
+
+	for _, monthly := range monthlyReturns {
+		if monthly < maxDrawdown {
+			maxDrawdown = monthly
+		}
+	}
+
+	return maxDrawdown
 }
