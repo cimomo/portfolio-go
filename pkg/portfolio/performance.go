@@ -7,6 +7,7 @@ import (
 	"github.com/piquette/finance-go"
 	"github.com/piquette/finance-go/chart"
 	"github.com/piquette/finance-go/datetime"
+	"github.com/piquette/finance-go/quote"
 )
 
 // Performance analyzes the historic performance of a portfolio
@@ -75,6 +76,12 @@ func (performance *Performance) Compute() error {
 	best, worst := computeBestAndWorstYears(yearly)
 	performance.BestYear = best
 	performance.WorstYear = worst
+
+	sharpe, err := computeSharpeRatio(performance.CAGR, performance.Stdev)
+	if err != nil {
+		return err
+	}
+	performance.SharpeRatio = sharpe
 
 	return nil
 }
@@ -270,4 +277,25 @@ func computeMaxDrawdown(monthlyReturns []float64) float64 {
 	}
 
 	return maxDrawdown
+}
+
+func computeRiskFreeReturn() (float64, error) {
+	// We use the yield of the 13-week treasury bill as the risk-free return
+	quote, err := quote.Get("^IRX")
+	if err != nil {
+		return 0, err
+	}
+
+	return quote.RegularMarketPrice, nil
+}
+
+func computeSharpeRatio(cagr float64, stdev float64) (float64, error) {
+	riskFree, err := computeRiskFreeReturn()
+	if err != nil {
+		return 0, err
+	}
+
+	sharpe := (cagr - riskFree) / stdev
+
+	return sharpe, nil
 }
