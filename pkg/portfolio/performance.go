@@ -182,7 +182,7 @@ func computeMonthlyBalances(portfolio *Portfolio, startDate time.Time, endDate t
 			monthly = make([]Historic, len(monthlyForAsset))
 		}
 
-		for i := range monthlyForAsset {
+		for i := range monthly {
 			open, _ := monthlyForAsset[i].Open.Float64()
 			monthly[i].Open += open * holding.Quantity
 
