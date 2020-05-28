@@ -65,6 +65,10 @@ func (performance *Performance) Compute() error {
 	performance.StartDate = startDate
 	performance.EndDate = endDate
 
+	return performance.computeResult()
+}
+
+func (performance *Performance) computeResult() error {
 	monthly, err := computeMonthlyBalances(performance.Portfolio, performance.StartDate, performance.EndDate)
 	if err != nil {
 		return err
