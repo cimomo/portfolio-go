@@ -12,10 +12,12 @@ import (
 
 // Performance analyzes the historic performance of a portfolio and compares it against a benchmark
 type Performance struct {
-	Portfolio *Portfolio
-	StartDate time.Time
-	EndDate   time.Time
-	Result    *PerformanceResult
+	Portfolio       *Portfolio
+	BenchmarkSymbol string
+	StartDate       time.Time
+	EndDate         time.Time
+	Result          *PerformanceResult
+	Benchmark       *PerformanceResult
 }
 
 // PerformanceResult contains the historic performance of a portfolio
@@ -40,10 +42,12 @@ type Historic struct {
 }
 
 // NewPerformance creates a new analysis of the historic performance of a portfolio
-func NewPerformance(portfolio *Portfolio) *Performance {
+func NewPerformance(portfolio *Portfolio, benchmark string) *Performance {
 	return &Performance{
-		Portfolio: portfolio,
-		Result:    NewPerformanceResult(),
+		Portfolio:       portfolio,
+		BenchmarkSymbol: benchmark,
+		Result:          NewPerformanceResult(),
+		Benchmark:       NewPerformanceResult(),
 	}
 }
 

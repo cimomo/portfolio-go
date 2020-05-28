@@ -8,6 +8,8 @@ import (
 	"github.com/cimomo/portfolio-go/pkg/terminal"
 )
 
+const benchmark = "SPY"
+
 func main() {
 	profile := flag.String("profile", "./examples/profile.yml", "(optional) Profile for portfolio")
 	flag.Parse()
@@ -19,7 +21,7 @@ func main() {
 
 	mkt := portfolio.NewMarket()
 
-	perf := portfolio.NewPerformance(port)
+	perf := portfolio.NewPerformance(port, benchmark)
 
 	err = startTerminal(mkt, port, perf)
 	if err != nil {
