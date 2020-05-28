@@ -54,14 +54,14 @@ func (viewer *PerformanceViewer) drawPerformance() {
 
 	setString(viewer.table, viewer.performance.Portfolio.Name, 1, 0, tcell.ColorWhite, tview.AlignLeft)
 	setString(viewer.table, viewer.performance.StartDate.Format("2006-01-02"), 1, 1, tcell.ColorWhite, tview.AlignRight)
-	setDollarAmount(viewer.table, viewer.performance.InitialBalance, 1, 2, tcell.ColorWhite)
-	setDollarAmount(viewer.table, viewer.performance.FinalBalance, 1, 3, tcell.ColorWhite)
-	setPercentChange(viewer.table, viewer.performance.CAGR, 1, 4)
-	setPercent(viewer.table, viewer.performance.Stdev, 1, 5, tcell.ColorWhite)
-	setPercentChange(viewer.table, viewer.performance.BestYear, 1, 6)
-	setPercentChange(viewer.table, viewer.performance.WorstYear, 1, 7)
-	setPercentChange(viewer.table, viewer.performance.MaxDrawdown, 1, 8)
-	setQuantity(viewer.table, viewer.performance.SharpeRatio, 1, 9, tview.AlignRight)
+	setDollarAmount(viewer.table, viewer.performance.Result.InitialBalance, 1, 2, tcell.ColorWhite)
+	setDollarAmount(viewer.table, viewer.performance.Result.FinalBalance, 1, 3, tcell.ColorWhite)
+	setPercentChange(viewer.table, viewer.performance.Result.CAGR, 1, 4)
+	setPercent(viewer.table, viewer.performance.Result.Stdev, 1, 5, tcell.ColorWhite)
+	setPercentChange(viewer.table, viewer.performance.Result.BestYear, 1, 6)
+	setPercentChange(viewer.table, viewer.performance.Result.WorstYear, 1, 7)
+	setPercentChange(viewer.table, viewer.performance.Result.MaxDrawdown, 1, 8)
+	setQuantity(viewer.table, viewer.performance.Result.SharpeRatio, 1, 9, tview.AlignRight)
 
 	setString(viewer.table, "S&P 500", 2, 0, tcell.ColorWhite, tview.AlignLeft)
 }

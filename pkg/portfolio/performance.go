@@ -10,11 +10,16 @@ import (
 	"github.com/piquette/finance-go/quote"
 )
 
-// Performance analyzes the historic performance of a portfolio
+// Performance analyzes the historic performance of a portfolio and compares it against a benchmark
 type Performance struct {
-	Portfolio           *Portfolio
-	StartDate           time.Time
-	EndDate             time.Time
+	Portfolio *Portfolio
+	StartDate time.Time
+	EndDate   time.Time
+	Result    *PerformanceResult
+}
+
+// PerformanceResult contains the historic performance of a portfolio
+type PerformanceResult struct {
 	Historic            []Historic
 	InitialBalance      float64
 	FinalBalance        float64
@@ -38,7 +43,13 @@ type Historic struct {
 func NewPerformance(portfolio *Portfolio) *Performance {
 	return &Performance{
 		Portfolio: portfolio,
+		Result:    NewPerformanceResult(),
 	}
+}
+
+// NewPerformanceResult creates a new historic performance result of a portfolio
+func NewPerformanceResult() *PerformanceResult {
+	return &PerformanceResult{}
 }
 
 // Compute generates the performance data for the portfolio
@@ -54,34 +65,34 @@ func (performance *Performance) Compute() error {
 	if err != nil {
 		return err
 	}
-	performance.Historic = monthly
-	performance.InitialBalance = monthly[0].Open
-	performance.FinalBalance = monthly[len(monthly)-1].Close
+	performance.Result.Historic = monthly
+	performance.Result.InitialBalance = monthly[0].Open
+	performance.Result.FinalBalance = monthly[len(monthly)-1].Close
 
-	cagr, err := computeCAGR(performance.StartDate, performance.EndDate, performance.InitialBalance, performance.FinalBalance)
+	cagr, err := computeCAGR(performance.StartDate, performance.EndDate, performance.Result.InitialBalance, performance.Result.FinalBalance)
 	if err != nil {
 		return err
 	}
-	performance.CAGR = cagr
+	performance.Result.CAGR = cagr
 
-	monthlyReturns := computeMonthlyReturns(performance.Historic)
+	monthlyReturns := computeMonthlyReturns(performance.Result.Historic)
 
 	sd := computeStandardDeviation(monthlyReturns)
-	performance.Stdev = sd
+	performance.Result.Stdev = sd
 
 	maxDrawdown := computeMaxDrawdown(monthlyReturns)
-	performance.MaxDrawdown = maxDrawdown
+	performance.Result.MaxDrawdown = maxDrawdown
 
-	yearly := computeYearlyReturns(performance.Historic, performance.StartDate, performance.EndDate)
+	yearly := computeYearlyReturns(performance.Result.Historic, performance.StartDate, performance.EndDate)
 	best, worst := computeBestAndWorstYears(yearly)
-	performance.BestYear = best
-	performance.WorstYear = worst
+	performance.Result.BestYear = best
+	performance.Result.WorstYear = worst
 
-	sharpe, err := computeSharpeRatio(performance.CAGR, performance.Stdev)
+	sharpe, err := computeSharpeRatio(performance.Result.CAGR, performance.Result.Stdev)
 	if err != nil {
 		return err
 	}
-	performance.SharpeRatio = sharpe
+	performance.Result.SharpeRatio = sharpe
 
 	return nil
 }
