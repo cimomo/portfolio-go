@@ -46,8 +46,6 @@ func NewPerformance(portfolio *Portfolio, benchmark string) *Performance {
 	return &Performance{
 		Portfolio:       portfolio,
 		BenchmarkSymbol: benchmark,
-		Result:          NewPerformanceResult(),
-		Benchmark:       NewPerformanceResult(),
 	}
 }
 
@@ -65,44 +63,52 @@ func (performance *Performance) Compute() error {
 	performance.StartDate = startDate
 	performance.EndDate = endDate
 
-	return performance.computeResult()
-}
-
-func (performance *Performance) computeResult() error {
-	monthly, err := computeMonthlyBalances(performance.Portfolio, performance.StartDate, performance.EndDate)
+	result, err := computeResult(performance.Portfolio, performance.StartDate, performance.EndDate)
 	if err != nil {
 		return err
 	}
-	performance.Result.Historic = monthly
-	performance.Result.InitialBalance = monthly[0].Open
-	performance.Result.FinalBalance = monthly[len(monthly)-1].Close
-
-	cagr, err := computeCAGR(performance.StartDate, performance.EndDate, performance.Result.InitialBalance, performance.Result.FinalBalance)
-	if err != nil {
-		return err
-	}
-	performance.Result.CAGR = cagr
-
-	monthlyReturns := computeMonthlyReturns(performance.Result.Historic)
-
-	sd := computeStandardDeviation(monthlyReturns)
-	performance.Result.Stdev = sd
-
-	maxDrawdown := computeMaxDrawdown(monthlyReturns)
-	performance.Result.MaxDrawdown = maxDrawdown
-
-	yearly := computeYearlyReturns(performance.Result.Historic, performance.StartDate, performance.EndDate)
-	best, worst := computeBestAndWorstYears(yearly)
-	performance.Result.BestYear = best
-	performance.Result.WorstYear = worst
-
-	sharpe, err := computeSharpeRatio(performance.Result.CAGR, performance.Result.Stdev)
-	if err != nil {
-		return err
-	}
-	performance.Result.SharpeRatio = sharpe
+	performance.Result = result
 
 	return nil
+}
+
+func computeResult(portfolio *Portfolio, startDate time.Time, endDate time.Time) (*PerformanceResult, error) {
+	result := NewPerformanceResult()
+
+	monthly, err := computeMonthlyBalances(portfolio, startDate, endDate)
+	if err != nil {
+		return nil, err
+	}
+	result.Historic = monthly
+	result.InitialBalance = monthly[0].Open
+	result.FinalBalance = monthly[len(monthly)-1].Close
+
+	cagr, err := computeCAGR(startDate, endDate, result.InitialBalance, result.FinalBalance)
+	if err != nil {
+		return nil, err
+	}
+	result.CAGR = cagr
+
+	monthlyReturns := computeMonthlyReturns(result.Historic)
+
+	sd := computeStandardDeviation(monthlyReturns)
+	result.Stdev = sd
+
+	maxDrawdown := computeMaxDrawdown(monthlyReturns)
+	result.MaxDrawdown = maxDrawdown
+
+	yearly := computeYearlyReturns(result.Historic, startDate, endDate)
+	best, worst := computeBestAndWorstYears(yearly)
+	result.BestYear = best
+	result.WorstYear = worst
+
+	sharpe, err := computeSharpeRatio(result.CAGR, result.Stdev)
+	if err != nil {
+		return nil, err
+	}
+	result.SharpeRatio = sharpe
+
+	return result, nil
 }
 
 func computeStartAndEndDateForPortfolio(portfolio *Portfolio) (time.Time, time.Time, error) {
