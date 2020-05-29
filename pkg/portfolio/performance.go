@@ -14,6 +14,7 @@ import (
 type Performance struct {
 	Portfolio       *Portfolio
 	BenchmarkSymbol string
+	InitialBalance  float64
 	StartDate       time.Time
 	EndDate         time.Time
 	Result          *PerformanceResult
@@ -23,7 +24,6 @@ type Performance struct {
 // PerformanceResult contains the historic performance of a portfolio
 type PerformanceResult struct {
 	Historic            []Historic
-	InitialBalance      float64
 	FinalBalance        float64
 	CAGR                float64
 	Stdev               float64
@@ -42,10 +42,11 @@ type Historic struct {
 }
 
 // NewPerformance creates a new analysis of the historic performance of a portfolio
-func NewPerformance(portfolio *Portfolio, benchmark string) *Performance {
+func NewPerformance(portfolio *Portfolio, benchmark string, initialBalance float64) *Performance {
 	return &Performance{
 		Portfolio:       portfolio,
 		BenchmarkSymbol: benchmark,
+		InitialBalance:  initialBalance,
 	}
 }
 
@@ -80,10 +81,9 @@ func computeResult(portfolio *Portfolio, startDate time.Time, endDate time.Time)
 		return nil, err
 	}
 	result.Historic = monthly
-	result.InitialBalance = monthly[0].Open
 	result.FinalBalance = monthly[len(monthly)-1].Close
 
-	cagr, err := computeCAGR(startDate, endDate, result.InitialBalance, result.FinalBalance)
+	cagr, err := computeCAGR(startDate, endDate, monthly[0].Open, result.FinalBalance)
 	if err != nil {
 		return nil, err
 	}
