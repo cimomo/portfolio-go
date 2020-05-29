@@ -152,7 +152,7 @@ func (portfolio *Portfolio) Clone() *Portfolio {
 
 	holdings := make(map[string]*Holding)
 	for k, v := range portfolio.Holdings {
-		holdings[k] = v
+		holdings[k] = v.Clone()
 	}
 
 	allocation := make(map[string]float64)

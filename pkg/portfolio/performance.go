@@ -65,7 +65,7 @@ func (performance *Performance) Compute() error {
 	performance.StartDate = startDate
 	performance.EndDate = endDate
 
-	result, err := computeResult(performance.Portfolio, performance.StartDate, performance.EndDate)
+	result, err := computeResult(performance.Portfolio, performance.StartDate, performance.EndDate, performance.InitialBalance)
 	if err != nil {
 		return err
 	}
@@ -74,13 +74,13 @@ func (performance *Performance) Compute() error {
 	return nil
 }
 
-func computeResult(portfolio *Portfolio, startDate time.Time, endDate time.Time) (*PerformanceResult, error) {
+func computeResult(portfolio *Portfolio, startDate time.Time, endDate time.Time, initialBalance float64) (*PerformanceResult, error) {
 	result := NewPerformanceResult()
 
 	normalized := computeNormalizedPortfolio(portfolio)
 	result.Portfolio = normalized
 
-	monthly, err := computeMonthlyBalances(normalized, startDate, endDate)
+	monthly, err := computeMonthlyBalances(normalized, startDate, endDate, initialBalance)
 	if err != nil {
 		return nil, err
 	}
@@ -203,15 +203,20 @@ func computeMonthlyBalancesForAsset(symbol string, startDate time.Time, endDate 
 	return monthly, nil
 }
 
-func computeMonthlyBalances(portfolio *Portfolio, startDate time.Time, endDate time.Time) ([]Historic, error) {
+func computeMonthlyBalances(portfolio *Portfolio, startDate time.Time, endDate time.Time, initialBalance float64) ([]Historic, error) {
 	var monthly []Historic
 
 	for _, symbol := range portfolio.Symbols {
 		holding := portfolio.Holdings[symbol]
+		allocation := portfolio.TargetAllocation[symbol]
+
 		monthlyForAsset, err := computeMonthlyBalancesForAsset(symbol, startDate, endDate)
 		if err != nil {
 			return nil, err
 		}
+
+		initialQuote, _ := monthlyForAsset[0].Open.Float64()
+		holding.Quantity = (initialBalance * (allocation / 100)) / initialQuote
 
 		if monthly == nil {
 			monthly = make([]Historic, len(monthlyForAsset))
