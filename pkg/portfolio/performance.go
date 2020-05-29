@@ -118,6 +118,18 @@ func computeResult(portfolio *Portfolio, startDate time.Time, endDate time.Time,
 func computeNormalizedPortfolio(portfolio *Portfolio) *Portfolio {
 	normalized := portfolio.Clone()
 
+	var total float64
+	for _, a := range normalized.TargetAllocation {
+		total += a
+	}
+
+	// If there is no target allocation specified, use the actual allocation instead
+	if total == 0 {
+		for k, v := range portfolio.Status.Allocation {
+			normalized.TargetAllocation[k] = v
+		}
+	}
+
 	return normalized
 }
 
