@@ -136,3 +136,33 @@ func (portfolio *Portfolio) RefreshStatus() {
 
 	portfolio.Status = &status
 }
+
+// Clone makes a copy of the Portfolio
+func (portfolio *Portfolio) Clone() *Portfolio {
+	port := Portfolio{
+		Name:      portfolio.Name,
+		CostBasis: portfolio.CostBasis,
+		Status:    &Status{},
+	}
+
+	symbols := make([]string, len(portfolio.Symbols))
+	for i := range portfolio.Symbols {
+		symbols[i] = portfolio.Symbols[i]
+	}
+
+	holdings := make(map[string]*Holding)
+	for k, v := range portfolio.Holdings {
+		holdings[k] = v
+	}
+
+	allocation := make(map[string]float64)
+	for k, v := range portfolio.TargetAllocation {
+		allocation[k] = v
+	}
+
+	port.Symbols = symbols
+	port.Holdings = holdings
+	port.TargetAllocation = allocation
+
+	return &port
+}

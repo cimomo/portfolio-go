@@ -83,3 +83,12 @@ func NewAsset(symbol string) *Asset {
 func defaultAsset(symbol string) *Asset {
 	return &Asset{symbol, AssetClassOther, AssetClassOther}
 }
+
+// Clone makes a copy of the Asset
+func (asset *Asset) Clone() *Asset {
+	return &Asset{
+		Symbol:   asset.Symbol,
+		Class:    asset.Class,
+		Subclass: asset.Subclass,
+	}
+}

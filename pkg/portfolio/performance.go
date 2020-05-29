@@ -23,6 +23,7 @@ type Performance struct {
 
 // PerformanceResult contains the historic performance of a portfolio
 type PerformanceResult struct {
+	Portfolio           *Portfolio
 	Historic            []Historic
 	FinalBalance        float64
 	CAGR                float64
@@ -76,7 +77,10 @@ func (performance *Performance) Compute() error {
 func computeResult(portfolio *Portfolio, startDate time.Time, endDate time.Time) (*PerformanceResult, error) {
 	result := NewPerformanceResult()
 
-	monthly, err := computeMonthlyBalances(portfolio, startDate, endDate)
+	normalized := computeNormalizedPortfolio(portfolio)
+	result.Portfolio = normalized
+
+	monthly, err := computeMonthlyBalances(normalized, startDate, endDate)
 	if err != nil {
 		return nil, err
 	}
@@ -109,6 +113,12 @@ func computeResult(portfolio *Portfolio, startDate time.Time, endDate time.Time)
 	result.SharpeRatio = sharpe
 
 	return result, nil
+}
+
+func computeNormalizedPortfolio(portfolio *Portfolio) *Portfolio {
+	normalized := portfolio.Clone()
+
+	return normalized
 }
 
 func computeStartAndEndDateForPortfolio(portfolio *Portfolio) (time.Time, time.Time, error) {

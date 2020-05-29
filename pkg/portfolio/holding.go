@@ -93,3 +93,14 @@ func (holding *Holding) GetHistoricalQuote(date time.Time) (*finance.ChartBar, e
 
 	return nil, iter.Err()
 }
+
+// Clone makes a copy of the Holding, with dynamic quote and status zeroed out
+func (holding *Holding) Clone() *Holding {
+	return &Holding{
+		Asset:     holding.Asset.Clone(),
+		Quantity:  holding.Quantity,
+		CostBasis: holding.CostBasis,
+		Quote:     &finance.Quote{},
+		Status:    &HoldingStatus{},
+	}
+}
