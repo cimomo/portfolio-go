@@ -64,4 +64,5 @@ func (viewer *PerformanceViewer) drawPerformance() {
 	setQuantity(viewer.table, viewer.performance.Result.SharpeRatio, 1, 9, tview.AlignRight)
 
 	setString(viewer.table, "S&P 500", 2, 0, tcell.ColorWhite, tview.AlignLeft)
+	setString(viewer.table, viewer.performance.StartDate.Format("2006-01-02"), 2, 1, tcell.ColorWhite, tview.AlignRight)
 }
