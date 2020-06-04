@@ -73,6 +73,14 @@ func (performance *Performance) Compute() error {
 	}
 	performance.Result = result
 
+	benchmark := computeBenchmark(performance.BenchmarkSymbol)
+
+	benchmarkResult, err := computeResult(benchmark, performance.StartDate, performance.EndDate, performance.InitialBalance)
+	if err != nil {
+		return err
+	}
+	performance.Benchmark = benchmarkResult
+
 	return nil
 }
 
@@ -137,7 +145,7 @@ func computeNormalizedPortfolio(portfolio *Portfolio) *Portfolio {
 func computeBenchmark(symbol string) *Portfolio {
 	holding := NewHolding(symbol, 0, 0)
 
-	benchmark := NewPortfolio("Benchmark")
+	benchmark := NewPortfolio("S&P 500")
 
 	benchmark.Symbols = append(benchmark.Symbols, symbol)
 	benchmark.Holdings[symbol] = holding
