@@ -65,7 +65,9 @@ func (performance *Performance) Compute() error {
 	performance.StartDate = startDate
 	performance.EndDate = endDate
 
-	result, err := computeResult(performance.Portfolio, performance.StartDate, performance.EndDate, performance.InitialBalance)
+	normalized := computeNormalizedPortfolio(performance.Portfolio)
+
+	result, err := computeResult(normalized, performance.StartDate, performance.EndDate, performance.InitialBalance)
 	if err != nil {
 		return err
 	}
@@ -77,10 +79,9 @@ func (performance *Performance) Compute() error {
 func computeResult(portfolio *Portfolio, startDate time.Time, endDate time.Time, initialBalance float64) (*PerformanceResult, error) {
 	result := NewPerformanceResult()
 
-	normalized := computeNormalizedPortfolio(portfolio)
-	result.Portfolio = normalized
+	result.Portfolio = portfolio
 
-	monthly, err := computeMonthlyBalances(normalized, startDate, endDate, initialBalance)
+	monthly, err := computeMonthlyBalances(portfolio, startDate, endDate, initialBalance)
 	if err != nil {
 		return nil, err
 	}
