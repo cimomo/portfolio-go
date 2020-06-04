@@ -133,6 +133,18 @@ func computeNormalizedPortfolio(portfolio *Portfolio) *Portfolio {
 	return normalized
 }
 
+func computeBenchmark(symbol string) *Portfolio {
+	holding := NewHolding(symbol, 0, 0)
+
+	benchmark := NewPortfolio("Benchmark")
+
+	benchmark.Symbols = append(benchmark.Symbols, symbol)
+	benchmark.Holdings[symbol] = holding
+	benchmark.TargetAllocation[symbol] = 100
+
+	return benchmark
+}
+
 func computeStartAndEndDateForPortfolio(portfolio *Portfolio) (time.Time, time.Time, error) {
 	ny, err := time.LoadLocation("America/New_York")
 	if err != nil {

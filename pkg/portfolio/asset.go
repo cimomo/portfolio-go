@@ -41,6 +41,7 @@ type Asset struct {
 // AssetDB returns a built-in database for assets of interest
 var AssetDB = func() map[string]*Asset {
 	return map[string]*Asset{
+		"SPY":  {"VTI", AssetClassUSStock, AssetClassUSStockLarge},
 		"VTI":  {"VTI", AssetClassUSStock, AssetClassUSStockLarge},
 		"VTV":  {"VTV", AssetClassUSStock, AssetClassUSStockLargeValue},
 		"VIG":  {"VTV", AssetClassUSStock, AssetClassUSStockLarge},
