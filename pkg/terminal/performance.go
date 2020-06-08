@@ -67,4 +67,5 @@ func (viewer *PerformanceViewer) drawPerformance() {
 	setString(viewer.table, viewer.performance.StartDate.Format("2006-01-02"), 2, 1, tcell.ColorWhite, tview.AlignRight)
 	setDollarAmount(viewer.table, viewer.performance.InitialBalance, 2, 2, tcell.ColorWhite)
 	setDollarAmount(viewer.table, viewer.performance.Benchmark.FinalBalance, 2, 3, tcell.ColorWhite)
+	setPercentChange(viewer.table, viewer.performance.Benchmark.CAGR, 2, 4)
 }
