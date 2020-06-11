@@ -70,4 +70,5 @@ func (viewer *PerformanceViewer) drawPerformance() {
 	setPercentChange(viewer.table, viewer.performance.Benchmark.CAGR, 2, 4)
 	setPercent(viewer.table, viewer.performance.Benchmark.Stdev, 2, 5, tcell.ColorWhite)
 	setPercentChange(viewer.table, viewer.performance.Benchmark.BestYear, 2, 6)
+	setPercentChange(viewer.table, viewer.performance.Benchmark.WorstYear, 2, 7)
 }
