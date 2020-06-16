@@ -73,4 +73,5 @@ func (viewer *PerformanceViewer) drawPerformance() {
 	setPercentChange(viewer.table, viewer.performance.Benchmark.WorstYear, 2, 7)
 	setPercentChange(viewer.table, viewer.performance.Benchmark.MaxDrawdown, 2, 8)
 	setQuantity(viewer.table, viewer.performance.Benchmark.SharpeRatio, 2, 9, tview.AlignRight)
+	setQuantity(viewer.table, 1, 2, 10, tview.AlignRight)
 }
