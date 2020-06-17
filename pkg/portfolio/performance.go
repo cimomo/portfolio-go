@@ -23,16 +23,15 @@ type Performance struct {
 
 // PerformanceResult contains the historic performance of a portfolio
 type PerformanceResult struct {
-	Portfolio           *Portfolio
-	Historic            []Historic
-	FinalBalance        float64
-	CAGR                float64
-	Stdev               float64
-	BestYear            float64
-	WorstYear           float64
-	MaxDrawdown         float64
-	SharpeRatio         float64
-	USMarketCorrelation float64
+	Portfolio    *Portfolio
+	Historic     []Historic
+	FinalBalance float64
+	CAGR         float64
+	Stdev        float64
+	BestYear     float64
+	WorstYear    float64
+	MaxDrawdown  float64
+	SharpeRatio  float64
 }
 
 // Historic represents a historic quote or portfolio value

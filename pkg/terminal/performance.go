@@ -31,8 +31,7 @@ func (viewer *PerformanceViewer) drawHeader() {
 	header := []string{
 		"Portfolio", "Start Date", "Initial Balance", "Final Balance",
 		"CAGR", "Stdev",
-		"Best Year", "Worst Year", "Max Drawdown",
-		"Sharpe Ratio", "US Market Correlation",
+		"Best Year", "Worst Year", "Max Drawdown", "Sharpe Ratio",
 	}
 
 	for c := 0; c < len(header); c++ {
@@ -73,5 +72,4 @@ func (viewer *PerformanceViewer) drawPerformance() {
 	setPercentChange(viewer.table, viewer.performance.Benchmark.WorstYear, 2, 7)
 	setPercentChange(viewer.table, viewer.performance.Benchmark.MaxDrawdown, 2, 8)
 	setQuantity(viewer.table, viewer.performance.Benchmark.SharpeRatio, 2, 9, tview.AlignRight)
-	setQuantity(viewer.table, 1, 2, 10, tview.AlignRight)
 }
