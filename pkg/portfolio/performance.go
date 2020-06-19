@@ -32,6 +32,7 @@ type PerformanceResult struct {
 	WorstYear    float64
 	MaxDrawdown  float64
 	SharpeRatio  float64
+	Return       *Return
 }
 
 // Historic represents a historic quote or portfolio value
@@ -39,6 +40,19 @@ type Historic struct {
 	Open  float64
 	Close float64
 	Date  time.Time
+}
+
+// Return represents the trailing returns of a portfolio
+type Return struct {
+	OneMonth   float64
+	ThreeMonth float64
+	SixMonth   float64
+	YTD        float64
+	OneYear    float64
+	ThreeYear  float64
+	FiveYear   float64
+	TenYear    float64
+	Max        float64
 }
 
 // NewPerformance creates a new analysis of the historic performance of a portfolio
