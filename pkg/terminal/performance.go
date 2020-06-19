@@ -48,6 +48,7 @@ func (viewer *PerformanceViewer) drawHeader() {
 func (viewer *PerformanceViewer) drawPerformance() {
 	if viewer.performance.StartDate.IsZero() {
 		setString(viewer.table, "Computing ...", 1, 0, tcell.ColorWhite, tview.AlignLeft)
+		setString(viewer.table, "Computing ...", 2, 0, tcell.ColorWhite, tview.AlignLeft)
 		return
 	}
 
