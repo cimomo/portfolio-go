@@ -16,6 +16,7 @@ type Terminal struct {
 	marketViewer      *MarketViewer
 	portfolioViewer   *PortfolioViewer
 	performanceViewer *PerformanceViewer
+	returnViewer      *ReturnViewer
 }
 
 // NewTerminal returns a new terminal window
@@ -39,6 +40,9 @@ func (term *Terminal) Start() error {
 	performanceViewer := NewPerformanceViewer(term.performance)
 	term.performanceViewer = performanceViewer
 
+	returnViewer := NewReturnViewer(term.performance)
+	term.returnViewer = returnViewer
+
 	term.setLayout()
 
 	err := term.draw()
@@ -48,6 +52,9 @@ func (term *Terminal) Start() error {
 
 	// The performance has not been computed yet. However, that's handled by the viewer
 	term.performanceViewer.Draw()
+
+	// The return has not been computed yet. However, that's handled by the viewer
+	term.returnViewer.Draw()
 
 	// This will lazily compute the performance and update the viewer
 	go term.showPerformance()
@@ -92,6 +99,7 @@ func (term *Terminal) drawPerformance() error {
 	}
 
 	term.performanceViewer.Draw()
+	term.returnViewer.Draw()
 
 	return nil
 }
@@ -115,9 +123,10 @@ func (term *Terminal) showPerformance() {
 }
 
 func (term *Terminal) setLayout() {
-	grid := tview.NewGrid().SetRows(4, 0, 8).SetColumns(0).SetBorders(false).
+	grid := tview.NewGrid().SetRows(4, 0, 8, 8).SetColumns(0).SetBorders(false).
 		AddItem(term.marketViewer.table, 0, 0, 1, 1, 0, 0, false).
 		AddItem(term.portfolioViewer.table, 1, 0, 1, 1, 0, 0, false).
-		AddItem(term.performanceViewer.table, 2, 0, 1, 1, 0, 0, false)
+		AddItem(term.performanceViewer.table, 2, 0, 1, 1, 0, 0, false).
+		AddItem(term.returnViewer.table, 3, 0, 1, 1, 0, 0, false)
 	term.application.SetRoot(grid, true)
 }
