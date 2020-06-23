@@ -175,7 +175,7 @@ func computeStartAndEndDateForPortfolio(portfolio *Portfolio) (time.Time, time.T
 
 	now := time.Now().In(ny)
 	thisYear := now.Year()
-	startYear := thisYear - 10
+	startYear := thisYear - 100
 	earliestDate := &datetime.Datetime{
 		Day:   1,
 		Month: 1,
