@@ -52,6 +52,7 @@ func (viewer *ReturnViewer) drawPerformance() {
 	}
 
 	setString(viewer.table, viewer.performance.Portfolio.Name, 1, 0, tcell.ColorWhite, tview.AlignLeft)
+	setPercentChange(viewer.table, viewer.performance.Result.Return.Max, 1, 10)
 
 	setString(viewer.table, viewer.performance.Benchmark.Portfolio.Name, 2, 0, tcell.ColorWhite, tview.AlignLeft)
 }

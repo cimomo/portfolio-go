@@ -69,6 +69,11 @@ func NewPerformanceResult() *PerformanceResult {
 	return &PerformanceResult{}
 }
 
+// NewReturn creates a new trailing return result of a portfolio
+func NewReturn() *Return {
+	return &Return{}
+}
+
 // Compute generates the performance data for the portfolio
 func (performance *Performance) Compute() error {
 	startDate, endDate, err := computeStartAndEndDateForPortfolio(performance.Portfolio)
@@ -134,7 +139,21 @@ func computeResult(portfolio *Portfolio, startDate time.Time, endDate time.Time,
 	}
 	result.SharpeRatio = sharpe
 
+	portfolioReturn, err := computeReturns(result, startDate, endDate)
+	if err != nil {
+		return nil, err
+	}
+	result.Return = portfolioReturn
+
 	return result, nil
+}
+
+func computeReturns(result *PerformanceResult, startDate time.Time, endDate time.Time) (*Return, error) {
+	portfolioReturn := NewReturn()
+
+	portfolioReturn.Max = result.CAGR
+
+	return portfolioReturn, nil
 }
 
 func computeNormalizedPortfolio(portfolio *Portfolio) *Portfolio {
