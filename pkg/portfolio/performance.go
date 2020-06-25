@@ -153,7 +153,64 @@ func computeReturns(result *PerformanceResult, startDate time.Time, endDate time
 
 	portfolioReturn.Max = result.CAGR
 
+	oneMonthAgo := endDate.AddDate(0, -1, 0)
+	if oneMonthAgo.Before(startDate) {
+		portfolioReturn.OneMonth = portfolioReturn.Max
+	} else {
+		oneMonth, err := computeShortTermReturn(result.Portfolio, oneMonthAgo, endDate, result.FinalBalance)
+		if err != nil {
+			return nil, err
+		}
+		portfolioReturn.OneMonth = oneMonth
+	}
+
 	return portfolioReturn, nil
+}
+
+func computeShortTermReturn(portfolio *Portfolio, startDate time.Time, endDate time.Time, finalBalance float64) (float64, error) {
+	value, err := computePortfolioValueForDate(portfolio, startDate, endDate)
+	if err != nil {
+		return 0, err
+	}
+
+	result := ((finalBalance - value) / value) * 100
+
+	return result, nil
+}
+
+func computePortfolioValueForDate(portfolio *Portfolio, earliest time.Time, endDate time.Time) (float64, error) {
+	var value float64
+
+	for _, symbol := range portfolio.Symbols {
+		holding := portfolio.Holdings[symbol]
+
+		assetValue, err := computeAssetValueForDate(earliest, endDate, symbol)
+		if err != nil {
+			return 0, nil
+		}
+
+		value += assetValue * holding.Quantity
+	}
+
+	return value, nil
+}
+
+func computeAssetValueForDate(earliest time.Time, endDate time.Time, symbol string) (float64, error) {
+	p := &chart.Params{
+		Symbol:   symbol,
+		Start:    datetime.New(&earliest),
+		End:      datetime.New(&endDate),
+		Interval: datetime.OneDay,
+	}
+
+	iter := chart.Get(p)
+	for iter.Next() {
+		b := iter.Bar()
+		value, _ := b.AdjClose.Float64()
+		return value, nil
+	}
+
+	return 0, iter.Err()
 }
 
 func computeNormalizedPortfolio(portfolio *Portfolio) *Portfolio {
