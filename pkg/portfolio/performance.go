@@ -114,10 +114,7 @@ func computeResult(portfolio *Portfolio, startDate time.Time, endDate time.Time,
 	result.Historic = monthly
 	result.FinalBalance = monthly[len(monthly)-1].Close
 
-	cagr, err := computeCAGR(startDate, endDate, monthly[0].Open, result.FinalBalance)
-	if err != nil {
-		return nil, err
-	}
+	cagr := computeCAGR(startDate, endDate, monthly[0].Open, result.FinalBalance)
 	result.CAGR = cagr
 
 	monthlyReturns := computeMonthlyReturns(result.Historic)
@@ -292,14 +289,14 @@ func computeStartDateForAsset(earliest time.Time, endDate time.Time, symbol stri
 	return time.Time{}, iter.Err()
 }
 
-func computeCAGR(startDate time.Time, endDate time.Time, initialBalance float64, finalBalance float64) (float64, error) {
+func computeCAGR(startDate time.Time, endDate time.Time, initialBalance float64, finalBalance float64) float64 {
 	duration := endDate.Sub(startDate)
 	hours := duration.Hours()
 	years := hours / 24 / 365
 
 	cagr := (math.Pow(finalBalance/initialBalance, 1/years) - 1) * 100
 
-	return cagr, nil
+	return cagr
 }
 
 func computeMonthlyBalancesForAsset(symbol string, startDate time.Time, endDate time.Time) ([]finance.ChartBar, error) {
