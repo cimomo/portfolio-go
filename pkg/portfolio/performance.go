@@ -161,6 +161,17 @@ func computeReturns(result *PerformanceResult, startDate time.Time, endDate time
 		portfolioReturn.OneMonth = oneMonth
 	}
 
+	threeMonthsAgo := endDate.AddDate(0, -3, 0)
+	if threeMonthsAgo.Before(startDate) {
+		portfolioReturn.ThreeMonth = portfolioReturn.Max
+	} else {
+		threeMonth, err := computeShortTermReturn(result.Portfolio, threeMonthsAgo, endDate, result.FinalBalance)
+		if err != nil {
+			return nil, err
+		}
+		portfolioReturn.ThreeMonth = threeMonth
+	}
+
 	return portfolioReturn, nil
 }
 
