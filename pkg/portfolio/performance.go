@@ -150,29 +150,35 @@ func computeReturns(result *PerformanceResult, startDate time.Time, endDate time
 
 	portfolioReturn.Max = result.CAGR
 
-	oneMonthAgo := endDate.AddDate(0, -1, 0)
-	if oneMonthAgo.Before(startDate) {
-		portfolioReturn.OneMonth = portfolioReturn.Max
-	} else {
-		oneMonth, err := computeShortTermReturn(result.Portfolio, oneMonthAgo, endDate, result.FinalBalance)
-		if err != nil {
-			return nil, err
-		}
-		portfolioReturn.OneMonth = oneMonth
+	oneMonth, err := computeXMonthReturn(result.Portfolio, startDate, endDate, 1, portfolioReturn.Max, result.FinalBalance)
+	if err != nil {
+		return nil, err
 	}
+	portfolioReturn.OneMonth = oneMonth
 
-	threeMonthsAgo := endDate.AddDate(0, -3, 0)
-	if threeMonthsAgo.Before(startDate) {
-		portfolioReturn.ThreeMonth = portfolioReturn.Max
-	} else {
-		threeMonth, err := computeShortTermReturn(result.Portfolio, threeMonthsAgo, endDate, result.FinalBalance)
-		if err != nil {
-			return nil, err
-		}
-		portfolioReturn.ThreeMonth = threeMonth
+	threeMonth, err := computeXMonthReturn(result.Portfolio, startDate, endDate, 3, portfolioReturn.Max, result.FinalBalance)
+	if err != nil {
+		return nil, err
 	}
+	portfolioReturn.ThreeMonth = threeMonth
 
 	return portfolioReturn, nil
+}
+
+func computeXMonthReturn(portfolio *Portfolio, startDate time.Time, endDate time.Time, monthsAgo int, max float64, finalBalance float64) (float64, error) {
+	var result float64
+	xMonthsAgo := endDate.AddDate(0, (-1)*monthsAgo, 0)
+	if xMonthsAgo.Before(startDate) {
+		result = max
+	} else {
+		xMonth, err := computeShortTermReturn(portfolio, xMonthsAgo, endDate, finalBalance)
+		if err != nil {
+			return 0, err
+		}
+		result = xMonth
+	}
+
+	return result, nil
 }
 
 func computeShortTermReturn(portfolio *Portfolio, startDate time.Time, endDate time.Time, finalBalance float64) (float64, error) {
