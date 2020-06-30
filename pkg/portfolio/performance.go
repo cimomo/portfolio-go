@@ -162,6 +162,12 @@ func computeReturns(result *PerformanceResult, startDate time.Time, endDate time
 	}
 	portfolioReturn.ThreeMonth = threeMonth
 
+	sixMonth, err := computeXMonthReturn(result.Portfolio, startDate, endDate, 6, portfolioReturn.Max, result.FinalBalance)
+	if err != nil {
+		return nil, err
+	}
+	portfolioReturn.SixMonth = sixMonth
+
 	return portfolioReturn, nil
 }
 
