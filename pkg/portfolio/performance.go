@@ -168,6 +168,15 @@ func computeReturns(result *PerformanceResult, startDate time.Time, endDate time
 	}
 	portfolioReturn.SixMonth = sixMonth
 
+	startOfYear := time.Date(endDate.Year(), time.January, 1, 0, 0, 0, 0, endDate.Location())
+	var ytd float64
+	if startOfYear.Before(startDate) {
+		ytd = portfolioReturn.Max
+	} else {
+		ytd, err = computeShortTermReturn(result.Portfolio, startOfYear, endDate, result.FinalBalance)
+	}
+	portfolioReturn.YTD = ytd
+
 	return portfolioReturn, nil
 }
 
