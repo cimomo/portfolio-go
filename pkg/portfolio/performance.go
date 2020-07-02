@@ -177,7 +177,7 @@ func computeReturns(result *PerformanceResult, startDate time.Time, endDate time
 	}
 	portfolioReturn.YTD = ytd
 
-	oneYear, err := computeXMonthReturn(result.Portfolio, startDate, endDate, 12, portfolioReturn.Max, result.FinalBalance)
+	oneYear, err := computeXYearReturn(result.Portfolio, startDate, endDate, 1, portfolioReturn.Max, result.FinalBalance)
 	if err != nil {
 		return nil, err
 	}
@@ -202,6 +202,22 @@ func computeXMonthReturn(portfolio *Portfolio, startDate time.Time, endDate time
 	return result, nil
 }
 
+func computeXYearReturn(portfolio *Portfolio, startDate time.Time, endDate time.Time, yearsAgo int, max float64, finalBalance float64) (float64, error) {
+	var result float64
+	xYearsAgo := endDate.AddDate((-1)*yearsAgo, 0, 0)
+	if xYearsAgo.Before(startDate) {
+		result = max
+	} else {
+		xYear, err := computeLongTermReturn(portfolio, xYearsAgo, endDate, finalBalance)
+		if err != nil {
+			return 0, err
+		}
+		result = xYear
+	}
+
+	return result, nil
+}
+
 func computeShortTermReturn(portfolio *Portfolio, startDate time.Time, endDate time.Time, finalBalance float64) (float64, error) {
 	value, err := computePortfolioValueForDate(portfolio, startDate, endDate)
 	if err != nil {
@@ -209,6 +225,17 @@ func computeShortTermReturn(portfolio *Portfolio, startDate time.Time, endDate t
 	}
 
 	result := ((finalBalance - value) / value) * 100
+
+	return result, nil
+}
+
+func computeLongTermReturn(portfolio *Portfolio, startDate time.Time, endDate time.Time, finalBalance float64) (float64, error) {
+	value, err := computePortfolioValueForDate(portfolio, startDate, endDate)
+	if err != nil {
+		return 0, err
+	}
+
+	result := computeCAGR(startDate, endDate, value, finalBalance)
 
 	return result, nil
 }
