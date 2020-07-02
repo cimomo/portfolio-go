@@ -177,6 +177,12 @@ func computeReturns(result *PerformanceResult, startDate time.Time, endDate time
 	}
 	portfolioReturn.YTD = ytd
 
+	oneYear, err := computeXMonthReturn(result.Portfolio, startDate, endDate, 12, portfolioReturn.Max, result.FinalBalance)
+	if err != nil {
+		return nil, err
+	}
+	portfolioReturn.OneYear = oneYear
+
 	return portfolioReturn, nil
 }
 
