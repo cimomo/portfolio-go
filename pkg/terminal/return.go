@@ -64,5 +64,6 @@ func (viewer *ReturnViewer) drawPerformance() {
 	setPercentChange(viewer.table, viewer.performance.Benchmark.Return.ThreeMonth, 2, 2)
 	setPercentChange(viewer.table, viewer.performance.Benchmark.Return.SixMonth, 2, 3)
 	setPercentChange(viewer.table, viewer.performance.Benchmark.Return.YTD, 2, 4)
+	setPercentChange(viewer.table, viewer.performance.Benchmark.Return.OneYear, 2, 5)
 	setPercentChange(viewer.table, viewer.performance.Benchmark.Return.Max, 2, 9)
 }
