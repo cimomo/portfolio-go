@@ -58,6 +58,7 @@ func (viewer *ReturnViewer) drawPerformance() {
 	setPercentChange(viewer.table, viewer.performance.Result.Return.YTD, 1, 4)
 	setPercentChange(viewer.table, viewer.performance.Result.Return.OneYear, 1, 5)
 	setPercentChange(viewer.table, viewer.performance.Result.Return.ThreeYear, 1, 6)
+	setPercentChange(viewer.table, viewer.performance.Result.Return.FiveYear, 1, 7)
 	setPercentChange(viewer.table, viewer.performance.Result.Return.Max, 1, 9)
 
 	setString(viewer.table, viewer.performance.Benchmark.Portfolio.Name, 2, 0, tcell.ColorWhite, tview.AlignLeft)
