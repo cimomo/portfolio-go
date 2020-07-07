@@ -195,6 +195,12 @@ func computeReturns(result *PerformanceResult, startDate time.Time, endDate time
 	}
 	portfolioReturn.FiveYear = fiveYear
 
+	tenYear, err := computeXYearReturn(result.Portfolio, startDate, endDate, 10, portfolioReturn.Max, result.FinalBalance)
+	if err != nil {
+		return nil, err
+	}
+	portfolioReturn.TenYear = tenYear
+
 	return portfolioReturn, nil
 }
 
