@@ -33,7 +33,7 @@ func main() {
 }
 
 func loadPortfolio(name string, profile string) (*portfolio.Portfolio, error) {
-	p := portfolio.NewPortfolio("Main")
+	p := portfolio.NewPortfolio()
 
 	err := p.Load(profile)
 	if err != nil {

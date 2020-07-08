@@ -1,3 +1,5 @@
+name: VTI
+holdings:
 - symbol: VTI
   quantity: 100
   allocation: 100

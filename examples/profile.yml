@@ -1,3 +1,5 @@
+name: Sample
+holdings:
 - symbol: VTI
   quantity: 313
   allocation: 18

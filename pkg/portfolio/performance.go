@@ -314,8 +314,9 @@ func computeNormalizedPortfolio(portfolio *Portfolio) *Portfolio {
 func computeBenchmark(symbol string) *Portfolio {
 	holding := NewHolding(symbol, 0, 0)
 
-	benchmark := NewPortfolio("S&P 500")
+	benchmark := NewPortfolio()
 
+	benchmark.Name = "S&P 500"
 	benchmark.Symbols = append(benchmark.Symbols, symbol)
 	benchmark.Holdings[symbol] = holding
 	benchmark.TargetAllocation[symbol] = 100

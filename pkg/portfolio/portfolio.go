@@ -35,12 +35,14 @@ type holdingConfig struct {
 	CostBasis        float64 `yaml:"basis"`
 }
 
-type portfolioConfig []holdingConfig
+type portfolioConfig struct {
+	Name     string          `yaml:"name"`
+	Holdings []holdingConfig `yaml:"holdings"`
+}
 
 // NewPortfolio returns an empty portfolio of asset holdings
-func NewPortfolio(name string) *Portfolio {
+func NewPortfolio() *Portfolio {
 	return &Portfolio{
-		Name:             name,
 		Symbols:          make([]string, 0),
 		Holdings:         make(map[string]*Holding),
 		TargetAllocation: make(map[string]float64),
@@ -62,9 +64,11 @@ func (portfolio *Portfolio) Load(profile string) error {
 		return err
 	}
 
+	portfolio.Name = portfolioConfig.Name
+
 	totalAllocation := 0.0
 
-	for _, holdingConfig := range portfolioConfig {
+	for _, holdingConfig := range portfolioConfig.Holdings {
 		portfolio.Symbols = append(portfolio.Symbols, holdingConfig.Symbol)
 		portfolio.Holdings[holdingConfig.Symbol] = NewHolding(
 			holdingConfig.Symbol,
