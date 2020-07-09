@@ -36,7 +36,7 @@ type holdingConfig struct {
 }
 
 type portfolioConfig struct {
-	Name     string          `yaml:"name"`
+	Name     string          `yaml:"portfolio"`
 	Holdings []holdingConfig `yaml:"holdings"`
 }
 
