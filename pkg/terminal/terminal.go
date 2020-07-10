@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/cimomo/portfolio-go/pkg/portfolio"
+	"github.com/gdamore/tcell"
 	"github.com/rivo/tview"
 )
 
@@ -128,5 +129,14 @@ func (term *Terminal) setLayout() {
 		AddItem(term.portfolioViewer.table, 1, 0, 1, 1, 0, 0, false).
 		AddItem(term.performanceViewer.table, 2, 0, 1, 1, 0, 0, false).
 		AddItem(term.returnViewer.table, 3, 0, 1, 1, 0, 0, false)
-	term.application.SetRoot(grid, true)
+	term.application.SetRoot(grid, true).SetInputCapture(term.keyCapture)
+}
+
+func (term *Terminal) keyCapture(event *tcell.EventKey) *tcell.EventKey {
+	if event.Key() == tcell.KeyRune && event.Rune() == 'q' {
+		term.Stop()
+		return nil
+	}
+
+	return event
 }
