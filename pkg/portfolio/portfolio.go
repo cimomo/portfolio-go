@@ -40,6 +40,8 @@ type portfolioConfig struct {
 	Holdings []holdingConfig `yaml:"holdings"`
 }
 
+type profileConfig []portfolioConfig
+
 // NewPortfolio returns an empty portfolio of asset holdings
 func NewPortfolio() *Portfolio {
 	return &Portfolio{
@@ -57,12 +59,14 @@ func (portfolio *Portfolio) Load(profile string) error {
 		return err
 	}
 
-	portfolioConfig := portfolioConfig{}
+	profileConfig := profileConfig{}
 
-	err = yaml.Unmarshal(file, &portfolioConfig)
+	err = yaml.Unmarshal(file, &profileConfig)
 	if err != nil {
 		return err
 	}
+
+	portfolioConfig := profileConfig[0]
 
 	portfolio.Name = portfolioConfig.Name
 
