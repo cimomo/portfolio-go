@@ -93,16 +93,9 @@ func (term *Terminal) draw() error {
 	return nil
 }
 
-func (term *Terminal) drawPerformance() error {
-	err := term.performance.Compute()
-	if err != nil {
-		return err
-	}
-
+func (term *Terminal) drawPerformance() {
 	term.performanceViewer.Draw()
 	term.returnViewer.Draw()
-
-	return nil
 }
 
 func (term *Terminal) refresh() {
@@ -117,10 +110,17 @@ func (term *Terminal) refresh() {
 	}
 }
 
-func (term *Terminal) showPerformance() {
+func (term *Terminal) showPerformance() error {
+	err := term.performance.Compute()
+	if err != nil {
+		return err
+	}
+
 	term.application.QueueUpdateDraw(func() {
 		term.drawPerformance()
 	})
+
+	return nil
 }
 
 func (term *Terminal) setLayout() {
