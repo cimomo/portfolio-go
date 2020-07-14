@@ -124,7 +124,7 @@ func (term *Terminal) showPerformance() {
 }
 
 func (term *Terminal) setLayout() {
-	grid := tview.NewGrid().SetRows(4, 0, 8, 8).SetColumns(0).SetBorders(false).
+	grid := tview.NewGrid().SetRows(4, 0, 8, 7).SetColumns(0).SetBorders(false).
 		AddItem(term.marketViewer.table, 0, 0, 1, 1, 0, 0, false).
 		AddItem(term.portfolioViewer.table, 1, 0, 1, 1, 0, 0, false).
 		AddItem(term.performanceViewer.table, 2, 0, 1, 1, 0, 0, false).
