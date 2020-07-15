@@ -2,10 +2,8 @@ package portfolio
 
 import (
 	"errors"
-	"io/ioutil"
 
 	"github.com/piquette/finance-go/quote"
-	"gopkg.in/yaml.v2"
 )
 
 // Portfolio defines a portfolio of asset holdings
@@ -40,8 +38,6 @@ type portfolioConfig struct {
 	Holdings []holdingConfig `yaml:"holdings"`
 }
 
-type profileConfig []portfolioConfig
-
 // NewPortfolio returns an empty portfolio of asset holdings
 func NewPortfolio() *Portfolio {
 	return &Portfolio{
@@ -52,27 +48,14 @@ func NewPortfolio() *Portfolio {
 	}
 }
 
-// Load loads a portfolio from the given file
-func (portfolio *Portfolio) Load(profile string) error {
-	file, err := ioutil.ReadFile(profile)
-	if err != nil {
-		return err
-	}
+// Load loads a portfolio from the config
+func (portfolio *Portfolio) Load(config portfolioConfig) error {
 
-	profileConfig := profileConfig{}
-
-	err = yaml.Unmarshal(file, &profileConfig)
-	if err != nil {
-		return err
-	}
-
-	portfolioConfig := profileConfig[0]
-
-	portfolio.Name = portfolioConfig.Name
+	portfolio.Name = config.Name
 
 	totalAllocation := 0.0
 
-	for _, holdingConfig := range portfolioConfig.Holdings {
+	for _, holdingConfig := range config.Holdings {
 		portfolio.Symbols = append(portfolio.Symbols, holdingConfig.Symbol)
 		portfolio.Holdings[holdingConfig.Symbol] = NewHolding(
 			holdingConfig.Symbol,

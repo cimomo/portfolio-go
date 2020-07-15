@@ -14,26 +14,26 @@ const (
 )
 
 func main() {
-	profile := flag.String("profile", "./examples/profile.yml", "(optional) Profile for portfolio")
+	profileFile := flag.String("profile", "./examples/profile.yml", "(optional) Profile for portfolio")
 	flag.Parse()
 
-	port, err := loadPortfolio("Main", *profile)
+	profile, err := loadProfile("Main", *profileFile)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	mkt := portfolio.NewMarket()
 
-	perf := portfolio.NewPerformance(port, benchmark, initialBalance)
+	perf := portfolio.NewPerformance(profile.Portfolios[0], benchmark, initialBalance)
 
-	err = startTerminal(mkt, port, perf)
+	err = startTerminal(mkt, profile.Portfolios[0], perf)
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-func loadPortfolio(name string, profile string) (*portfolio.Portfolio, error) {
-	p := portfolio.NewPortfolio()
+func loadProfile(name string, profile string) (*portfolio.Profile, error) {
+	p := portfolio.NewProfile(name)
 
 	err := p.Load(profile)
 	if err != nil {
