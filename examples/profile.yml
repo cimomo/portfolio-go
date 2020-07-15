@@ -1,4 +1,4 @@
-- portfolio: Sample
+- portfolio: Strategic
   holdings:
   - symbol: VTI
     quantity: 313
@@ -56,3 +56,9 @@
     quantity: 908
     allocation: 10
     basis: 10000
+- portfolio: Minimal
+  holdings:
+  - symbol: VTI
+    quantity: 100
+    allocation: 100
+    basis: 5000
