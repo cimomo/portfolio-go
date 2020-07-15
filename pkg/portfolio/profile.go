@@ -36,13 +36,11 @@ func (profile *Profile) Load(name string) error {
 		return err
 	}
 
-	portfolioConfig := profileConfig[0]
-
-	portfolio := NewPortfolio()
-
-	portfolio.Load(portfolioConfig)
-
-	profile.Portfolios = append(profile.Portfolios, portfolio)
+	for _, portfolioConfig := range profileConfig {
+		portfolio := NewPortfolio()
+		portfolio.Load(portfolioConfig)
+		profile.Portfolios = append(profile.Portfolios, portfolio)
+	}
 
 	return nil
 }
