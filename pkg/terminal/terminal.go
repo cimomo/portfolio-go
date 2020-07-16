@@ -12,7 +12,7 @@ import (
 type Terminal struct {
 	application       *tview.Application
 	market            *portfolio.Market
-	portfolio         *portfolio.Portfolio
+	profile           *portfolio.Profile
 	performance       *portfolio.Performance
 	marketViewer      *MarketViewer
 	portfolioViewer   *PortfolioViewer
@@ -21,10 +21,10 @@ type Terminal struct {
 }
 
 // NewTerminal returns a new terminal window
-func NewTerminal(market *portfolio.Market, portfolio *portfolio.Portfolio, performance *portfolio.Performance) *Terminal {
+func NewTerminal(market *portfolio.Market, profile *portfolio.Profile, performance *portfolio.Performance) *Terminal {
 	return &Terminal{
 		application: tview.NewApplication(),
-		portfolio:   portfolio,
+		profile:     profile,
 		market:      market,
 		performance: performance,
 	}
@@ -32,7 +32,7 @@ func NewTerminal(market *portfolio.Market, portfolio *portfolio.Portfolio, perfo
 
 // Start starts the terminal application
 func (term *Terminal) Start() error {
-	portfolioViewer := NewPortfolioViewer(term.portfolio)
+	portfolioViewer := NewPortfolioViewer(term.profile.Portfolios[0])
 	term.portfolioViewer = portfolioViewer
 
 	marketViewer := NewMarketViewer(term.market)
@@ -82,7 +82,7 @@ func (term *Terminal) draw() error {
 		return err
 	}
 
-	err = term.portfolio.Refresh()
+	err = term.profile.Portfolios[0].Refresh()
 	if err != nil {
 		return err
 	}

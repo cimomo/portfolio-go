@@ -26,7 +26,7 @@ func main() {
 
 	perf := portfolio.NewPerformance(profile.Portfolios[0], benchmark, initialBalance)
 
-	err = startTerminal(mkt, profile.Portfolios[0], perf)
+	err = startTerminal(mkt, profile, perf)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -43,8 +43,8 @@ func loadProfile(name string, profile string) (*portfolio.Profile, error) {
 	return p, nil
 }
 
-func startTerminal(market *portfolio.Market, portfolio *portfolio.Portfolio, performance *portfolio.Performance) error {
-	term := terminal.NewTerminal(market, portfolio, performance)
+func startTerminal(market *portfolio.Market, profile *portfolio.Profile, performance *portfolio.Performance) error {
+	term := terminal.NewTerminal(market, profile, performance)
 
 	err := term.Start()
 	if err != nil {
