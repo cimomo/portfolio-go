@@ -59,17 +59,11 @@ func (term *Terminal) Start() error {
 		return err
 	}
 
-	// The performance has not been computed yet. However, that's handled by the viewer
-	term.performanceViewer.Draw()
-
-	// The return has not been computed yet. However, that's handled by the viewer
-	term.returnViewer.Draw()
-
 	// This will lazily compute the performance and update the viewer
-	go term.showPerformance()
+	go term.refreshPerformance()
 
 	// Periodically refresh the market and portfolio data
-	go term.refresh()
+	go term.doPeriodicRefresh()
 
 	err = term.application.Run()
 	if err != nil {
@@ -98,7 +92,18 @@ func (term *Terminal) draw() error {
 	term.portfolioViewer.Draw()
 	term.marketViewer.Draw()
 
+	// The performance and return data have not been computed yet. However, that's handled by the viewer
+	term.drawPerformance()
+
 	return nil
+}
+
+func (term *Terminal) drawMarket() {
+	term.marketViewer.Draw()
+}
+
+func (term *Terminal) drawPortfolio() {
+	term.portfolioViewer.Draw()
 }
 
 func (term *Terminal) drawPerformance() {
@@ -106,19 +111,33 @@ func (term *Terminal) drawPerformance() {
 	term.returnViewer.Draw()
 }
 
-func (term *Terminal) refresh() {
-	ticker := time.NewTicker(time.Second * 10)
-	for {
-		select {
-		case <-ticker.C:
-			term.application.QueueUpdateDraw(func() {
-				term.draw()
-			})
-		}
+func (term *Terminal) refreshMarket() error {
+	err := term.market.Refresh()
+	if err != nil {
+		return err
 	}
+
+	term.application.QueueUpdateDraw(func() {
+		term.drawMarket()
+	})
+
+	return nil
 }
 
-func (term *Terminal) showPerformance() error {
+func (term *Terminal) refreshPortfolio() error {
+	err := term.profile.Portfolios[0].Refresh()
+	if err != nil {
+		return err
+	}
+
+	term.application.QueueUpdateDraw(func() {
+		term.drawPortfolio()
+	})
+
+	return nil
+}
+
+func (term *Terminal) refreshPerformance() error {
 	err := term.performance.Compute()
 	if err != nil {
 		return err
@@ -129,6 +148,17 @@ func (term *Terminal) showPerformance() error {
 	})
 
 	return nil
+}
+
+func (term *Terminal) doPeriodicRefresh() {
+	ticker := time.NewTicker(time.Second * 10)
+	for {
+		select {
+		case <-ticker.C:
+			term.refreshMarket()
+			term.refreshPortfolio()
+		}
+	}
 }
 
 func (term *Terminal) setLayout() {
