@@ -8,6 +8,11 @@ import (
 	"github.com/rivo/tview"
 )
 
+const (
+	benchmark      = "SPY"
+	initialBalance = 100000.00
+)
+
 // Terminal defines the main terminal window for portfolio visualization
 type Terminal struct {
 	application       *tview.Application
@@ -21,7 +26,10 @@ type Terminal struct {
 }
 
 // NewTerminal returns a new terminal window
-func NewTerminal(market *portfolio.Market, profile *portfolio.Profile, performance *portfolio.Performance) *Terminal {
+func NewTerminal(profile *portfolio.Profile) *Terminal {
+	market := portfolio.NewMarket()
+	performance := portfolio.NewPerformance(profile.Portfolios[0], benchmark, initialBalance)
+
 	return &Terminal{
 		application: tview.NewApplication(),
 		profile:     profile,
