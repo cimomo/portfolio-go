@@ -15,15 +15,15 @@ const (
 
 // Terminal defines the main terminal window for portfolio visualization
 type Terminal struct {
-	application       *tview.Application
-	market            *portfolio.Market
-	profile           *portfolio.Profile
-	performance       *portfolio.Performance
-	marketViewer      *MarketViewer
-	portfolioViewer   *PortfolioViewer
-	performanceViewer *PerformanceViewer
-	returnViewer      *ReturnViewer
-	signalPerformance chan int
+	application              *tview.Application
+	market                   *portfolio.Market
+	profile                  *portfolio.Profile
+	performance              *portfolio.Performance
+	marketViewer             *MarketViewer
+	portfolioViewer          *PortfolioViewer
+	performanceViewer        *PerformanceViewer
+	returnViewer             *ReturnViewer
+	signalRefreshPerformance chan int
 }
 
 // NewTerminal returns a new terminal window
@@ -32,11 +32,11 @@ func NewTerminal(profile *portfolio.Profile) *Terminal {
 	performance := portfolio.NewPerformance(profile.Portfolios[0], benchmark, initialBalance)
 
 	return &Terminal{
-		application:       tview.NewApplication(),
-		profile:           profile,
-		market:            market,
-		performance:       performance,
-		signalPerformance: make(chan int),
+		application:              tview.NewApplication(),
+		profile:                  profile,
+		market:                   market,
+		performance:              performance,
+		signalRefreshPerformance: make(chan int),
 	}
 }
 
@@ -65,7 +65,7 @@ func (term *Terminal) Start() error {
 	go term.refreshPerformance()
 
 	// Periodically refresh the market and portfolio data
-	go term.doPeriodicRefresh()
+	go term.doRefresh()
 
 	err = term.application.Run()
 	if err != nil {
@@ -145,12 +145,12 @@ func (term *Terminal) refreshPerformance() error {
 		return err
 	}
 
-	term.signalPerformance <- 0
+	term.signalRefreshPerformance <- 0
 
 	return nil
 }
 
-func (term *Terminal) doPeriodicRefresh() {
+func (term *Terminal) doRefresh() {
 	ticker := time.NewTicker(time.Second * 10)
 	for {
 		select {
@@ -158,7 +158,7 @@ func (term *Terminal) doPeriodicRefresh() {
 			term.refreshMarket()
 			term.refreshPortfolio()
 
-		case <-term.signalPerformance:
+		case <-term.signalRefreshPerformance:
 			term.application.QueueUpdateDraw(func() {
 				term.drawPerformance()
 			})
