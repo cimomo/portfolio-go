@@ -23,6 +23,7 @@ type Terminal struct {
 	portfolioViewer   *PortfolioViewer
 	performanceViewer *PerformanceViewer
 	returnViewer      *ReturnViewer
+	signalPerformance chan int
 }
 
 // NewTerminal returns a new terminal window
@@ -31,10 +32,11 @@ func NewTerminal(profile *portfolio.Profile) *Terminal {
 	performance := portfolio.NewPerformance(profile.Portfolios[0], benchmark, initialBalance)
 
 	return &Terminal{
-		application: tview.NewApplication(),
-		profile:     profile,
-		market:      market,
-		performance: performance,
+		application:       tview.NewApplication(),
+		profile:           profile,
+		market:            market,
+		performance:       performance,
+		signalPerformance: make(chan int),
 	}
 }
 
@@ -143,9 +145,7 @@ func (term *Terminal) refreshPerformance() error {
 		return err
 	}
 
-	term.application.QueueUpdateDraw(func() {
-		term.drawPerformance()
-	})
+	term.signalPerformance <- 0
 
 	return nil
 }
@@ -157,6 +157,11 @@ func (term *Terminal) doPeriodicRefresh() {
 		case <-ticker.C:
 			term.refreshMarket()
 			term.refreshPortfolio()
+
+		case <-term.signalPerformance:
+			term.application.QueueUpdateDraw(func() {
+				term.drawPerformance()
+			})
 		}
 	}
 }
