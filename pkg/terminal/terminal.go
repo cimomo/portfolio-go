@@ -8,16 +8,10 @@ import (
 	"github.com/rivo/tview"
 )
 
-const (
-	benchmark      = "SPY"
-	initialBalance = 100000.00
-)
-
 // Terminal defines the main terminal window for portfolio visualization
 type Terminal struct {
 	application              *tview.Application
 	profile                  *portfolio.Profile
-	performance              *portfolio.Performance
 	marketViewer             *MarketViewer
 	portfolioViewer          *PortfolioViewer
 	performanceViewer        *PerformanceViewer
@@ -27,12 +21,9 @@ type Terminal struct {
 
 // NewTerminal returns a new terminal window
 func NewTerminal(profile *portfolio.Profile) *Terminal {
-	performance := portfolio.NewPerformance(profile.Portfolios[0], benchmark, initialBalance)
-
 	return &Terminal{
 		application:              tview.NewApplication(),
 		profile:                  profile,
-		performance:              performance,
 		signalRefreshPerformance: make(chan int),
 	}
 }
@@ -45,10 +36,10 @@ func (term *Terminal) Start() error {
 	marketViewer := NewMarketViewer(term.profile.Market)
 	term.marketViewer = marketViewer
 
-	performanceViewer := NewPerformanceViewer(term.performance)
+	performanceViewer := NewPerformanceViewer(term.profile.Portfolios[0].Performance)
 	term.performanceViewer = performanceViewer
 
-	returnViewer := NewReturnViewer(term.performance)
+	returnViewer := NewReturnViewer(term.profile.Portfolios[0].Performance)
 	term.returnViewer = returnViewer
 
 	term.setLayout()
@@ -137,7 +128,7 @@ func (term *Terminal) refreshPortfolio() error {
 }
 
 func (term *Terminal) refreshPerformance() error {
-	err := term.performance.Compute()
+	err := term.profile.Portfolios[0].Performance.Compute()
 	if err != nil {
 		return err
 	}

@@ -6,6 +6,11 @@ import (
 	"github.com/piquette/finance-go/quote"
 )
 
+const (
+	benchmark      = "SPY"
+	initialBalance = 100000.00
+)
+
 // Portfolio defines a portfolio of asset holdings
 type Portfolio struct {
 	Name             string
@@ -14,6 +19,7 @@ type Portfolio struct {
 	Holdings         map[string]*Holding
 	TargetAllocation map[string]float64
 	Status           *Status
+	Performance      *Performance
 }
 
 // Status defines the real-time status of the entire portfolio
@@ -40,12 +46,18 @@ type portfolioConfig struct {
 
 // NewPortfolio returns an empty portfolio of asset holdings
 func NewPortfolio() *Portfolio {
-	return &Portfolio{
+	portfolio := Portfolio{
 		Symbols:          make([]string, 0),
 		Holdings:         make(map[string]*Holding),
 		TargetAllocation: make(map[string]float64),
 		Status:           &Status{},
 	}
+
+	performance := NewPerformance(&portfolio, benchmark, initialBalance)
+
+	portfolio.Performance = performance
+
+	return &portfolio
 }
 
 // Load loads a portfolio from the config
