@@ -9,6 +9,7 @@ import (
 // Profile contains multiple portfolios
 type Profile struct {
 	Name       string
+	Market     *Market
 	Portfolios []*Portfolio
 }
 
@@ -18,6 +19,7 @@ type profileConfig []portfolioConfig
 func NewProfile(name string) *Profile {
 	return &Profile{
 		Name:       name,
+		Market:     NewMarket(),
 		Portfolios: make([]*Portfolio, 0),
 	}
 }

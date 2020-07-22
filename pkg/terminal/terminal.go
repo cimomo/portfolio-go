@@ -16,7 +16,6 @@ const (
 // Terminal defines the main terminal window for portfolio visualization
 type Terminal struct {
 	application              *tview.Application
-	market                   *portfolio.Market
 	profile                  *portfolio.Profile
 	performance              *portfolio.Performance
 	marketViewer             *MarketViewer
@@ -28,13 +27,11 @@ type Terminal struct {
 
 // NewTerminal returns a new terminal window
 func NewTerminal(profile *portfolio.Profile) *Terminal {
-	market := portfolio.NewMarket()
 	performance := portfolio.NewPerformance(profile.Portfolios[0], benchmark, initialBalance)
 
 	return &Terminal{
 		application:              tview.NewApplication(),
 		profile:                  profile,
-		market:                   market,
 		performance:              performance,
 		signalRefreshPerformance: make(chan int),
 	}
@@ -45,7 +42,7 @@ func (term *Terminal) Start() error {
 	portfolioViewer := NewPortfolioViewer(term.profile.Portfolios[0])
 	term.portfolioViewer = portfolioViewer
 
-	marketViewer := NewMarketViewer(term.market)
+	marketViewer := NewMarketViewer(term.profile.Market)
 	term.marketViewer = marketViewer
 
 	performanceViewer := NewPerformanceViewer(term.performance)
@@ -81,7 +78,7 @@ func (term *Terminal) Stop() {
 }
 
 func (term *Terminal) draw() error {
-	err := term.market.Refresh()
+	err := term.profile.Market.Refresh()
 	if err != nil {
 		return err
 	}
@@ -114,7 +111,7 @@ func (term *Terminal) drawPerformance() {
 }
 
 func (term *Terminal) refreshMarket() error {
-	err := term.market.Refresh()
+	err := term.profile.Market.Refresh()
 	if err != nil {
 		return err
 	}
