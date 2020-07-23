@@ -49,13 +49,13 @@ func (term *Terminal) Start() error {
 
 	term.setLayout()
 
-	err := term.draw()
+	err := term.draw(0)
 	if err != nil {
 		return err
 	}
 
 	// This will lazily compute the performance and update the viewer
-	go term.refreshPerformance()
+	go term.refreshPerformance(0)
 
 	// Periodically refresh the market and portfolio data
 	go term.doRefresh()
@@ -73,22 +73,22 @@ func (term *Terminal) Stop() {
 	term.application.Stop()
 }
 
-func (term *Terminal) draw() error {
+func (term *Terminal) draw(index int) error {
 	err := term.profile.Market.Refresh()
 	if err != nil {
 		return err
 	}
 
-	err = term.profile.Portfolios[0].Refresh()
+	err = term.profile.Portfolios[index].Refresh()
 	if err != nil {
 		return err
 	}
 
-	term.portfolioViewers[0].Draw()
 	term.marketViewer.Draw()
+	term.drawPortfolio(index)
 
 	// The performance and return data have not been computed yet. However, that's handled by the viewer
-	term.drawPerformance()
+	term.drawPerformance(index)
 
 	return nil
 }
@@ -97,13 +97,13 @@ func (term *Terminal) drawMarket() {
 	term.marketViewer.Draw()
 }
 
-func (term *Terminal) drawPortfolio() {
-	term.portfolioViewers[0].Draw()
+func (term *Terminal) drawPortfolio(index int) {
+	term.portfolioViewers[index].Draw()
 }
 
-func (term *Terminal) drawPerformance() {
-	term.performanceViewers[0].Draw()
-	term.returnViewers[0].Draw()
+func (term *Terminal) drawPerformance(index int) {
+	term.performanceViewers[index].Draw()
+	term.returnViewers[index].Draw()
 }
 
 func (term *Terminal) refreshMarket() error {
@@ -119,21 +119,21 @@ func (term *Terminal) refreshMarket() error {
 	return nil
 }
 
-func (term *Terminal) refreshPortfolio() error {
-	err := term.profile.Portfolios[0].Refresh()
+func (term *Terminal) refreshPortfolio(index int) error {
+	err := term.profile.Portfolios[index].Refresh()
 	if err != nil {
 		return err
 	}
 
 	term.application.QueueUpdateDraw(func() {
-		term.drawPortfolio()
+		term.drawPortfolio(index)
 	})
 
 	return nil
 }
 
-func (term *Terminal) refreshPerformance() error {
-	err := term.profile.Portfolios[0].Performance.Compute()
+func (term *Terminal) refreshPerformance(index int) error {
+	err := term.profile.Portfolios[index].Performance.Compute()
 	if err != nil {
 		return err
 	}
@@ -145,15 +145,17 @@ func (term *Terminal) refreshPerformance() error {
 
 func (term *Terminal) doRefresh() {
 	ticker := time.NewTicker(time.Second * 10)
+	index := 0
+
 	for {
 		select {
 		case <-ticker.C:
 			term.refreshMarket()
-			term.refreshPortfolio()
+			term.refreshPortfolio(index)
 
-		case <-term.signalRefreshPerformance:
+		case index = <-term.signalRefreshPerformance:
 			term.application.QueueUpdateDraw(func() {
-				term.drawPerformance()
+				term.drawPerformance(index)
 			})
 		}
 	}
