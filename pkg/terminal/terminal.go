@@ -13,9 +13,9 @@ type Terminal struct {
 	application              *tview.Application
 	profile                  *portfolio.Profile
 	marketViewer             *MarketViewer
-	portfolioViewer          *PortfolioViewer
-	performanceViewer        *PerformanceViewer
-	returnViewer             *ReturnViewer
+	portfolioViewers         []*PortfolioViewer
+	performanceViewers       []*PerformanceViewer
+	returnViewers            []*ReturnViewer
 	signalRefreshPerformance chan int
 }
 
@@ -24,23 +24,28 @@ func NewTerminal(profile *portfolio.Profile) *Terminal {
 	return &Terminal{
 		application:              tview.NewApplication(),
 		profile:                  profile,
+		portfolioViewers:         make([]*PortfolioViewer, 0),
+		performanceViewers:       make([]*PerformanceViewer, 0),
+		returnViewers:            make([]*ReturnViewer, 0),
 		signalRefreshPerformance: make(chan int),
 	}
 }
 
 // Start starts the terminal application
 func (term *Terminal) Start() error {
-	portfolioViewer := NewPortfolioViewer(term.profile.Portfolios[0])
-	term.portfolioViewer = portfolioViewer
-
 	marketViewer := NewMarketViewer(term.profile.Market)
 	term.marketViewer = marketViewer
 
-	performanceViewer := NewPerformanceViewer(term.profile.Portfolios[0].Performance)
-	term.performanceViewer = performanceViewer
+	for _, portfolio := range term.profile.Portfolios {
+		portfolioViewer := NewPortfolioViewer(portfolio)
+		term.portfolioViewers = append(term.portfolioViewers, portfolioViewer)
 
-	returnViewer := NewReturnViewer(term.profile.Portfolios[0].Performance)
-	term.returnViewer = returnViewer
+		performanceViewer := NewPerformanceViewer(portfolio.Performance)
+		term.performanceViewers = append(term.performanceViewers, performanceViewer)
+
+		returnViewer := NewReturnViewer(portfolio.Performance)
+		term.returnViewers = append(term.returnViewers, returnViewer)
+	}
 
 	term.setLayout()
 
@@ -79,7 +84,7 @@ func (term *Terminal) draw() error {
 		return err
 	}
 
-	term.portfolioViewer.Draw()
+	term.portfolioViewers[0].Draw()
 	term.marketViewer.Draw()
 
 	// The performance and return data have not been computed yet. However, that's handled by the viewer
@@ -93,12 +98,12 @@ func (term *Terminal) drawMarket() {
 }
 
 func (term *Terminal) drawPortfolio() {
-	term.portfolioViewer.Draw()
+	term.portfolioViewers[0].Draw()
 }
 
 func (term *Terminal) drawPerformance() {
-	term.performanceViewer.Draw()
-	term.returnViewer.Draw()
+	term.performanceViewers[0].Draw()
+	term.returnViewers[0].Draw()
 }
 
 func (term *Terminal) refreshMarket() error {
@@ -157,9 +162,9 @@ func (term *Terminal) doRefresh() {
 func (term *Terminal) setLayout() {
 	grid := tview.NewGrid().SetRows(4, 0, 8, 7).SetColumns(0).SetBorders(false).
 		AddItem(term.marketViewer.table, 0, 0, 1, 1, 0, 0, false).
-		AddItem(term.portfolioViewer.table, 1, 0, 1, 1, 0, 0, false).
-		AddItem(term.performanceViewer.table, 2, 0, 1, 1, 0, 0, false).
-		AddItem(term.returnViewer.table, 3, 0, 1, 1, 0, 0, false)
+		AddItem(term.portfolioViewers[0].table, 1, 0, 1, 1, 0, 0, false).
+		AddItem(term.performanceViewers[0].table, 2, 0, 1, 1, 0, 0, false).
+		AddItem(term.returnViewers[0].table, 3, 0, 1, 1, 0, 0, false)
 	term.application.SetRoot(grid, true).SetInputCapture(term.keyCapture)
 }
 
