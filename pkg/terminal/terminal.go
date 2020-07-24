@@ -1,6 +1,7 @@
 package terminal
 
 import (
+	"errors"
 	"time"
 
 	"github.com/cimomo/portfolio-go/pkg/portfolio"
@@ -11,6 +12,7 @@ import (
 // Terminal defines the main terminal window for portfolio visualization
 type Terminal struct {
 	application             *tview.Application
+	root                    *tview.Grid
 	profile                 *portfolio.Profile
 	marketViewer            *MarketViewer
 	portfolioViewers        []*PortfolioViewer
@@ -51,20 +53,12 @@ func (term *Terminal) Start() error {
 		term.returnViewers = append(term.returnViewers, returnViewer)
 	}
 
-	term.setLayout()
-
-	err := term.draw(0)
-	if err != nil {
-		return err
-	}
-
-	// This will lazily compute the performance and update the viewer
-	go term.refreshPerformance(0)
+	term.initializeViewer()
 
 	// Periodically refresh the market and portfolio data
 	go term.doRefresh()
 
-	err = term.application.Run()
+	err := term.application.Run()
 	if err != nil {
 		return err
 	}
@@ -93,6 +87,38 @@ func (term *Terminal) draw(index int) error {
 
 	// The performance and return data have not been computed yet. However, that's handled by the viewer
 	term.drawPerformance(index)
+
+	return nil
+}
+
+func (term *Terminal) initializeViewer() error {
+	term.setLayout()
+
+	err := term.draw(0)
+	if err != nil {
+		return err
+	}
+
+	// This will lazily compute the performance and return data
+	go term.refreshPerformance(0)
+
+	return nil
+}
+
+func (term *Terminal) switchViewer(index int) error {
+	if index >= len(term.portfolioViewers) {
+		return errors.New("Viewer index out of range")
+	}
+
+	term.resetLayout(index)
+
+	err := term.draw(index)
+	if err != nil {
+		return err
+	}
+
+	// This will lazily compute the performance and return data
+	go term.refreshPerformance(index)
 
 	return nil
 }
@@ -172,18 +198,32 @@ func (term *Terminal) doRefresh() {
 }
 
 func (term *Terminal) setLayout() {
-	grid := tview.NewGrid().SetRows(4, 0, 8, 7).SetColumns(0).SetBorders(false).
-		AddItem(term.marketViewer.table, 0, 0, 1, 1, 0, 0, false).
-		AddItem(term.portfolioViewers[0].table, 1, 0, 1, 1, 0, 0, false).
-		AddItem(term.performanceViewers[0].table, 2, 0, 1, 1, 0, 0, false).
-		AddItem(term.returnViewers[0].table, 3, 0, 1, 1, 0, 0, false)
+	grid := tview.NewGrid().SetRows(4, 0, 8, 7).SetColumns(0).SetBorders(false)
 	term.application.SetRoot(grid, true).SetInputCapture(term.keyCapture)
+	term.root = grid
+	term.resetLayout(0)
+}
+
+func (term *Terminal) resetLayout(index int) {
+	term.root.Clear()
+	term.root.AddItem(term.marketViewer.table, 0, 0, 1, 1, 0, 0, false).
+		AddItem(term.portfolioViewers[index].table, 1, 0, 1, 1, 0, 0, false).
+		AddItem(term.performanceViewers[index].table, 2, 0, 1, 1, 0, 0, false).
+		AddItem(term.returnViewers[index].table, 3, 0, 1, 1, 0, 0, false)
 }
 
 func (term *Terminal) keyCapture(event *tcell.EventKey) *tcell.EventKey {
-	if event.Key() == tcell.KeyRune && event.Rune() == 'q' {
-		term.Stop()
-		return nil
+	if event.Key() == tcell.KeyRune {
+		rune := event.Rune()
+		if rune == 'q' {
+			term.Stop()
+			return nil
+
+		} else if rune >= '1' && rune <= '9' {
+			index := int(rune - '1')
+			term.switchViewer(index)
+			return nil
+		}
 	}
 
 	return event
