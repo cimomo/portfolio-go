@@ -10,24 +10,28 @@ import (
 
 // Terminal defines the main terminal window for portfolio visualization
 type Terminal struct {
-	application              *tview.Application
-	profile                  *portfolio.Profile
-	marketViewer             *MarketViewer
-	portfolioViewers         []*PortfolioViewer
-	performanceViewers       []*PerformanceViewer
-	returnViewers            []*ReturnViewer
-	signalRefreshPerformance chan int
+	application             *tview.Application
+	profile                 *portfolio.Profile
+	marketViewer            *MarketViewer
+	portfolioViewers        []*PortfolioViewer
+	performanceViewers      []*PerformanceViewer
+	returnViewers           []*ReturnViewer
+	signalRedrawMarket      chan int
+	signalRedrawPortfolio   chan int
+	signalRedrawPerformance chan int
 }
 
 // NewTerminal returns a new terminal window
 func NewTerminal(profile *portfolio.Profile) *Terminal {
 	return &Terminal{
-		application:              tview.NewApplication(),
-		profile:                  profile,
-		portfolioViewers:         make([]*PortfolioViewer, 0),
-		performanceViewers:       make([]*PerformanceViewer, 0),
-		returnViewers:            make([]*ReturnViewer, 0),
-		signalRefreshPerformance: make(chan int),
+		application:             tview.NewApplication(),
+		profile:                 profile,
+		portfolioViewers:        make([]*PortfolioViewer, 0),
+		performanceViewers:      make([]*PerformanceViewer, 0),
+		returnViewers:           make([]*ReturnViewer, 0),
+		signalRedrawMarket:      make(chan int),
+		signalRedrawPortfolio:   make(chan int),
+		signalRedrawPerformance: make(chan int),
 	}
 }
 
@@ -84,7 +88,7 @@ func (term *Terminal) draw(index int) error {
 		return err
 	}
 
-	term.marketViewer.Draw()
+	term.drawMarket()
 	term.drawPortfolio(index)
 
 	// The performance and return data have not been computed yet. However, that's handled by the viewer
@@ -112,9 +116,7 @@ func (term *Terminal) refreshMarket() error {
 		return err
 	}
 
-	term.application.QueueUpdateDraw(func() {
-		term.drawMarket()
-	})
+	term.signalRedrawMarket <- 0
 
 	return nil
 }
@@ -125,9 +127,7 @@ func (term *Terminal) refreshPortfolio(index int) error {
 		return err
 	}
 
-	term.application.QueueUpdateDraw(func() {
-		term.drawPortfolio(index)
-	})
+	term.signalRedrawPortfolio <- index
 
 	return nil
 }
@@ -138,7 +138,7 @@ func (term *Terminal) refreshPerformance(index int) error {
 		return err
 	}
 
-	term.signalRefreshPerformance <- 0
+	term.signalRedrawPerformance <- index
 
 	return nil
 }
@@ -150,10 +150,20 @@ func (term *Terminal) doRefresh() {
 	for {
 		select {
 		case <-ticker.C:
-			term.refreshMarket()
-			term.refreshPortfolio(index)
+			go term.refreshMarket()
+			go term.refreshPortfolio(index)
 
-		case index = <-term.signalRefreshPerformance:
+		case <-term.signalRedrawMarket:
+			term.application.QueueUpdateDraw(func() {
+				term.drawMarket()
+			})
+
+		case index = <-term.signalRedrawPortfolio:
+			term.application.QueueUpdateDraw(func() {
+				term.drawPortfolio(index)
+			})
+
+		case index = <-term.signalRedrawPerformance:
 			term.application.QueueUpdateDraw(func() {
 				term.drawPerformance(index)
 			})
