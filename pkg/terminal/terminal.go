@@ -85,7 +85,7 @@ func (term *Terminal) draw(index int) error {
 	term.drawMarket()
 	term.drawPortfolio(index)
 
-	// The performance and return data have not been computed yet. However, that's handled by the viewer
+	// The performance and return data may not have been computed yet. However, that's handled by the viewer
 	term.drawPerformance(index)
 
 	return nil
@@ -100,7 +100,7 @@ func (term *Terminal) initializeViewer() error {
 	}
 
 	// This will lazily compute the performance and return data
-	go term.refreshPerformance(0)
+	go term.computeAllPerformance()
 
 	return nil
 }
@@ -116,9 +116,6 @@ func (term *Terminal) switchViewer(index int) error {
 	if err != nil {
 		return err
 	}
-
-	// This will lazily compute the performance and return data
-	go term.refreshPerformance(index)
 
 	return nil
 }
@@ -158,14 +155,25 @@ func (term *Terminal) refreshPortfolio(index int) error {
 	return nil
 }
 
-func (term *Terminal) refreshPerformance(index int) error {
+func (term *Terminal) computeAllPerformance() error {
+	for i := range term.profile.Portfolios {
+		err := term.computePerformance(i)
+		if err != nil {
+			return err
+		}
+	}
+
+	// Sending a negative integer will cause the drawing thread to redraw the current viewer
+	term.signalRedrawPerformance <- -1
+
+	return nil
+}
+
+func (term *Terminal) computePerformance(index int) error {
 	err := term.profile.Portfolios[index].Performance.Compute()
 	if err != nil {
 		return err
 	}
-
-	term.signalRedrawPerformance <- index
-
 	return nil
 }
 
@@ -184,12 +192,20 @@ func (term *Terminal) doRefresh() {
 				term.drawMarket()
 			})
 
-		case index = <-term.signalRedrawPortfolio:
+		case i := <-term.signalRedrawPortfolio:
+			if i >= 0 {
+				index = i
+			}
+
 			term.application.QueueUpdateDraw(func() {
 				term.drawPortfolio(index)
 			})
 
-		case index = <-term.signalRedrawPerformance:
+		case i := <-term.signalRedrawPerformance:
+			if i >= 0 {
+				index = i
+			}
+
 			term.application.QueueUpdateDraw(func() {
 				term.drawPerformance(index)
 			})

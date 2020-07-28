@@ -19,6 +19,7 @@ type Performance struct {
 	EndDate         time.Time
 	Result          *PerformanceResult
 	Benchmark       *PerformanceResult
+	Ready           bool
 }
 
 // PerformanceResult contains the historic performance of a portfolio
@@ -61,6 +62,7 @@ func NewPerformance(portfolio *Portfolio, benchmark string, initialBalance float
 		Portfolio:       portfolio,
 		BenchmarkSymbol: benchmark,
 		InitialBalance:  initialBalance,
+		Ready:           false,
 	}
 }
 
@@ -98,6 +100,8 @@ func (performance *Performance) Compute() error {
 		return err
 	}
 	performance.Benchmark = benchmarkResult
+
+	performance.Ready = true
 
 	return nil
 }
