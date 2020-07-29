@@ -15,6 +15,7 @@ type Terminal struct {
 	root                    *tview.Grid
 	profile                 *portfolio.Profile
 	marketViewer            *MarketViewer
+	profileViewer           *ProfileViewer
 	portfolioViewers        []*PortfolioViewer
 	performanceViewers      []*PerformanceViewer
 	returnViewers           []*ReturnViewer
@@ -41,6 +42,9 @@ func NewTerminal(profile *portfolio.Profile) *Terminal {
 func (term *Terminal) Start() error {
 	marketViewer := NewMarketViewer(term.profile.Market)
 	term.marketViewer = marketViewer
+
+	profileViewer := NewProfileViewer(term.profile)
+	term.profileViewer = profileViewer
 
 	for _, portfolio := range term.profile.Portfolios {
 		portfolioViewer := NewPortfolioViewer(portfolio)
@@ -71,7 +75,29 @@ func (term *Terminal) Stop() {
 	term.application.Stop()
 }
 
-func (term *Terminal) draw(index int) error {
+func (term *Terminal) drawHomepage() error {
+	err := term.profile.Market.Refresh()
+	if err != nil {
+		return err
+	}
+
+	for _, portfolio := range term.profile.Portfolios {
+		err = portfolio.Refresh()
+		if err != nil {
+			return err
+		}
+	}
+
+	term.drawMarket()
+	term.drawProfile()
+
+	// The performance and return data may not have been computed yet. However, that's handled by the viewer
+	term.drawPerformance(0)
+
+	return nil
+}
+
+func (term *Terminal) drawPage(index int) error {
 	err := term.profile.Market.Refresh()
 	if err != nil {
 		return err
@@ -94,7 +120,7 @@ func (term *Terminal) draw(index int) error {
 func (term *Terminal) initializeViewer() error {
 	term.setLayout()
 
-	err := term.draw(0)
+	err := term.drawHomepage()
 	if err != nil {
 		return err
 	}
@@ -112,7 +138,7 @@ func (term *Terminal) switchViewer(index int) error {
 
 	term.resetLayout(index)
 
-	err := term.draw(index)
+	err := term.drawPage(index)
 	if err != nil {
 		return err
 	}
@@ -122,6 +148,10 @@ func (term *Terminal) switchViewer(index int) error {
 
 func (term *Terminal) drawMarket() {
 	term.marketViewer.Draw()
+}
+
+func (term *Terminal) drawProfile() {
+	term.profileViewer.Draw()
 }
 
 func (term *Terminal) drawPortfolio(index int) {
@@ -214,10 +244,13 @@ func (term *Terminal) doRefresh() {
 }
 
 func (term *Terminal) setLayout() {
-	grid := tview.NewGrid().SetRows(4, 0, 8, 7).SetColumns(0).SetBorders(false)
+	grid := tview.NewGrid().SetRows(4, 0, 8, 7).SetColumns(0).SetBorders(false).
+		AddItem(term.marketViewer.table, 0, 0, 1, 1, 0, 0, false).
+		AddItem(term.profileViewer.table, 1, 0, 1, 1, 0, 0, false).
+		AddItem(term.performanceViewers[0].table, 2, 0, 1, 1, 0, 0, false).
+		AddItem(term.returnViewers[0].table, 3, 0, 1, 1, 0, 0, false)
 	term.application.SetRoot(grid, true).SetInputCapture(term.keyCapture)
 	term.root = grid
-	term.resetLayout(0)
 }
 
 func (term *Terminal) resetLayout(index int) {
