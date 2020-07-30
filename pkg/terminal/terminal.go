@@ -118,7 +118,7 @@ func (term *Terminal) drawPage(index int) error {
 }
 
 func (term *Terminal) initializeViewer() error {
-	term.setLayout()
+	term.initializeLayout()
 
 	err := term.drawHomepage()
 	if err != nil {
@@ -136,11 +136,21 @@ func (term *Terminal) switchViewer(index int) error {
 		return errors.New("Viewer index out of range")
 	}
 
-	term.resetLayout(index)
+	if index < 0 {
+		term.setLayoutForHomepage()
 
-	err := term.drawPage(index)
-	if err != nil {
-		return err
+		err := term.drawHomepage()
+		if err != nil {
+			return err
+		}
+
+	} else {
+		term.setLayoutForPage(index)
+
+		err := term.drawPage(index)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -243,17 +253,22 @@ func (term *Terminal) doRefresh() {
 	}
 }
 
-func (term *Terminal) setLayout() {
-	grid := tview.NewGrid().SetRows(4, 0, 8, 7).SetColumns(0).SetBorders(false).
-		AddItem(term.marketViewer.table, 0, 0, 1, 1, 0, 0, false).
+func (term *Terminal) initializeLayout() {
+	grid := tview.NewGrid().SetRows(4, 0, 8, 7).SetColumns(0).SetBorders(false)
+	term.application.SetRoot(grid, true).SetInputCapture(term.keyCapture)
+	term.root = grid
+	term.setLayoutForHomepage()
+}
+
+func (term *Terminal) setLayoutForHomepage() {
+	term.root.Clear()
+	term.root.AddItem(term.marketViewer.table, 0, 0, 1, 1, 0, 0, false).
 		AddItem(term.profileViewer.table, 1, 0, 1, 1, 0, 0, false).
 		AddItem(term.performanceViewers[0].table, 2, 0, 1, 1, 0, 0, false).
 		AddItem(term.returnViewers[0].table, 3, 0, 1, 1, 0, 0, false)
-	term.application.SetRoot(grid, true).SetInputCapture(term.keyCapture)
-	term.root = grid
 }
 
-func (term *Terminal) resetLayout(index int) {
+func (term *Terminal) setLayoutForPage(index int) {
 	term.root.Clear()
 	term.root.AddItem(term.marketViewer.table, 0, 0, 1, 1, 0, 0, false).
 		AddItem(term.portfolioViewers[index].table, 1, 0, 1, 1, 0, 0, false).
@@ -271,6 +286,10 @@ func (term *Terminal) keyCapture(event *tcell.EventKey) *tcell.EventKey {
 		} else if rune >= '1' && rune <= '9' {
 			index := int(rune - '1')
 			term.switchViewer(index)
+			return nil
+
+		} else if rune == 'h' {
+			term.switchViewer(-1)
 			return nil
 		}
 	}
