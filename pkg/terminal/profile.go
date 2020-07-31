@@ -52,13 +52,13 @@ func (viewer *ProfileViewer) drawProfile() {
 	r := 1
 	for _, portfolio := range portfolios {
 		setString(viewer.table, portfolio.Name, r, 0, tcell.ColorWhite, tview.AlignLeft)
-		setDollarAmount(viewer.table, portfolio.Status.Value, r, 1, tcell.ColorYellow)
+		setDollarAmount(viewer.table, portfolio.Status.Value, r, 1, tcell.ColorWhite)
 		setPercentChange(viewer.table, portfolio.Status.RegularMarketChangePercent, r, 2)
 		setDollarChange(viewer.table, portfolio.Status.RegularMarketChange, r, 3)
 		setDollarChange(viewer.table, portfolio.Status.Unrealized, r, 4)
 		setPercentChange(viewer.table, portfolio.Status.UnrealizedPercent, r, 5)
-		setPercent(viewer.table, 0.0, r, 6, tcell.ColorYellow)
-		setPercent(viewer.table, 0.0, r, 7, tcell.ColorYellow)
+		setPercent(viewer.table, 0.0, r, 6, tcell.ColorWhite)
+		setPercent(viewer.table, 0.0, r, 7, tcell.ColorWhite)
 
 		r++
 	}
