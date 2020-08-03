@@ -29,14 +29,14 @@ func (viewer *ProfileViewer) Draw() {
 func (viewer *ProfileViewer) drawHeader() {
 	var cell *tview.TableCell
 	header := []string{
-		"NAME", "VALUE", "1-Day CHANGE%", "1-Day VALUE CHANGE$",
+		"NAME", "COST BASIS", "VALUE", "1-DAY CHANGE%", "1-DAY VALUE CHANGE$",
 		"UNREALIZED GAIN/LOSS$", "UNREALIZED GAIN/LOSS%",
-		"Allocation", "Target",
+		"ALLOCATION", "TARGET",
 	}
 
 	for c := 0; c < len(header); c++ {
 		cell = tview.NewTableCell(header[c]).SetTextColor(tcell.ColorYellow).SetBackgroundColor(tcell.ColorDarkSlateGray).SetAttributes(tcell.AttrBold)
-		if c < 2 {
+		if c < 1 {
 			cell.SetAlign(tview.AlignLeft)
 		} else {
 			cell.SetAlign((tview.AlignRight))
@@ -52,18 +52,25 @@ func (viewer *ProfileViewer) drawProfile() {
 	r := 1
 	for _, portfolio := range portfolios {
 		setString(viewer.table, portfolio.Name, r, 0, tcell.ColorWhite, tview.AlignLeft)
-		setDollarAmount(viewer.table, portfolio.Status.Value, r, 1, tcell.ColorWhite)
-		setPercentChange(viewer.table, portfolio.Status.RegularMarketChangePercent, r, 2)
-		setDollarChange(viewer.table, portfolio.Status.RegularMarketChange, r, 3)
-		setDollarChange(viewer.table, portfolio.Status.Unrealized, r, 4)
-		setPercentChange(viewer.table, portfolio.Status.UnrealizedPercent, r, 5)
-		setPercent(viewer.table, 0.0, r, 6, tcell.ColorWhite)
-		setPercent(viewer.table, 0.0, r, 7, tcell.ColorWhite)
+		setDollarAmount(viewer.table, portfolio.CostBasis, r, 1, tcell.ColorWhite)
+		setDollarAmount(viewer.table, portfolio.Status.Value, r, 2, tcell.ColorWhite)
+		setPercentChange(viewer.table, portfolio.Status.RegularMarketChangePercent, r, 3)
+		setDollarChange(viewer.table, portfolio.Status.RegularMarketChange, r, 4)
+		setDollarChange(viewer.table, portfolio.Status.Unrealized, r, 5)
+		setPercentChange(viewer.table, portfolio.Status.UnrealizedPercent, r, 6)
+		setPercent(viewer.table, profile.Status.Allocation[portfolio.Name], r, 7, tcell.ColorWhite)
+		setPercent(viewer.table, 0.0, r, 8, tcell.ColorWhite)
 
 		r++
 	}
 
 	setString(viewer.table, "TOTAL", r, 0, tcell.ColorYellow, tview.AlignLeft)
-	setPercent(viewer.table, 100.0, r, 6, tcell.ColorYellow)
+	setDollarAmount(viewer.table, profile.CostBasis, r, 1, tcell.ColorYellow)
+	setDollarAmount(viewer.table, profile.Status.Value, r, 2, tcell.ColorYellow)
+	setPercentChange(viewer.table, profile.Status.RegularMarketChangePercent, r, 3)
+	setDollarChange(viewer.table, profile.Status.RegularMarketChange, r, 4)
+	setDollarChange(viewer.table, profile.Status.Unrealized, r, 5)
+	setPercentChange(viewer.table, profile.Status.UnrealizedPercent, r, 6)
 	setPercent(viewer.table, 100.0, r, 7, tcell.ColorYellow)
+	setPercent(viewer.table, 100.0, r, 8, tcell.ColorYellow)
 }

@@ -81,11 +81,9 @@ func (term *Terminal) drawHomepage() error {
 		return err
 	}
 
-	for _, portfolio := range term.profile.Portfolios {
-		err = portfolio.Refresh()
-		if err != nil {
-			return err
-		}
+	err = term.profile.Refresh()
+	if err != nil {
+		return err
 	}
 
 	term.drawMarket()

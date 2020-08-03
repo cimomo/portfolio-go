@@ -30,10 +30,10 @@ func (viewer *PortfolioViewer) drawHeader() {
 	var cell *tview.TableCell
 	header := []string{
 		"SYMBOL", "CLASS", "QUANTITY", "PRICE",
-		"1-Day CHANGE$", "1-Day CHANGE%",
+		"1-DAY CHANGE$", "1-DAY CHANGE%",
 		"VALUE", "1-Day VALUE CHANGE$",
 		"UNREALIZED GAIN/LOSS$", "UNREALIZED GAIN/LOSS%",
-		"Allocation", "Target",
+		"ALLOCATION", "TARGET",
 	}
 
 	for c := 0; c < len(header); c++ {
