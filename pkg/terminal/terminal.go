@@ -22,6 +22,7 @@ type Terminal struct {
 	signalRedrawMarket      chan int
 	signalRedrawPortfolio   chan int
 	signalRedrawPerformance chan int
+	signalSwitchViewer      chan int
 }
 
 // NewTerminal returns a new terminal window
@@ -35,6 +36,7 @@ func NewTerminal(profile *portfolio.Profile) *Terminal {
 		signalRedrawMarket:      make(chan int),
 		signalRedrawPortfolio:   make(chan int),
 		signalRedrawPerformance: make(chan int),
+		signalSwitchViewer:      make(chan int),
 	}
 }
 
@@ -133,6 +135,8 @@ func (term *Terminal) switchViewer(index int) error {
 	if index >= len(term.portfolioViewers) {
 		return errors.New("Viewer index out of range")
 	}
+
+	term.signalSwitchViewer <- index
 
 	if index < 0 {
 		term.setLayoutForHomepage()
@@ -247,6 +251,11 @@ func (term *Terminal) doRefresh() {
 			term.application.QueueUpdateDraw(func() {
 				term.drawPerformance(index)
 			})
+
+		case i := <-term.signalSwitchViewer:
+			if i >= 0 {
+				index = i
+			}
 		}
 	}
 }
