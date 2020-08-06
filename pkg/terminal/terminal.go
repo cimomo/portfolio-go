@@ -20,6 +20,7 @@ type Terminal struct {
 	performanceViewers      []*PerformanceViewer
 	returnViewers           []*ReturnViewer
 	signalRedrawMarket      chan int
+	signalRedrawProfile     chan int
 	signalRedrawPortfolio   chan int
 	signalRedrawPerformance chan int
 	signalSwitchViewer      chan int
@@ -35,6 +36,7 @@ func NewTerminal(profile *portfolio.Profile) *Terminal {
 		returnViewers:           make([]*ReturnViewer, 0),
 		signalRedrawMarket:      make(chan int),
 		signalRedrawPortfolio:   make(chan int),
+		signalRedrawProfile:     make(chan int),
 		signalRedrawPerformance: make(chan int),
 		signalSwitchViewer:      make(chan int),
 	}
@@ -186,6 +188,17 @@ func (term *Terminal) refreshMarket() error {
 	return nil
 }
 
+func (term *Terminal) refreshProfile() error {
+	err := term.profile.Refresh()
+	if err != nil {
+		return err
+	}
+
+	term.signalRedrawProfile <- 0
+
+	return nil
+}
+
 func (term *Terminal) refreshPortfolio(index int) error {
 	err := term.profile.Portfolios[index].Refresh()
 	if err != nil {
@@ -221,41 +234,44 @@ func (term *Terminal) computePerformance(index int) error {
 
 func (term *Terminal) doRefresh() {
 	ticker := time.NewTicker(time.Second * 10)
-	index := 0
+	index := -1
 
 	for {
 		select {
 		case <-ticker.C:
 			go term.refreshMarket()
-			go term.refreshPortfolio(index)
+
+			if index < 0 {
+				go term.refreshProfile()
+			} else {
+				go term.refreshPortfolio(index)
+			}
 
 		case <-term.signalRedrawMarket:
 			term.application.QueueUpdateDraw(func() {
 				term.drawMarket()
 			})
 
-		case i := <-term.signalRedrawPortfolio:
-			if i >= 0 {
-				index = i
-			}
+		case <-term.signalRedrawProfile:
+			term.application.QueueUpdateDraw(func() {
+				term.drawProfile()
+			})
 
+		case <-term.signalRedrawPortfolio:
 			term.application.QueueUpdateDraw(func() {
 				term.drawPortfolio(index)
 			})
 
-		case i := <-term.signalRedrawPerformance:
-			if i >= 0 {
-				index = i
-			}
-
+		case <-term.signalRedrawPerformance:
 			term.application.QueueUpdateDraw(func() {
-				term.drawPerformance(index)
+				i := 0
+				if index >= 0 {
+					i = index
+				}
+				term.drawPerformance(i)
 			})
 
-		case i := <-term.signalSwitchViewer:
-			if i >= 0 {
-				index = i
-			}
+		case index = <-term.signalSwitchViewer:
 		}
 	}
 }
