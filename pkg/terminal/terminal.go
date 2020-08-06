@@ -11,19 +11,21 @@ import (
 
 // Terminal defines the main terminal window for portfolio visualization
 type Terminal struct {
-	application             *tview.Application
-	root                    *tview.Grid
-	profile                 *portfolio.Profile
-	marketViewer            *MarketViewer
-	profileViewer           *ProfileViewer
-	portfolioViewers        []*PortfolioViewer
-	performanceViewers      []*PerformanceViewer
-	returnViewers           []*ReturnViewer
-	signalRedrawMarket      chan int
-	signalRedrawProfile     chan int
-	signalRedrawPortfolio   chan int
-	signalRedrawPerformance chan int
-	signalSwitchViewer      chan int
+	application              *tview.Application
+	root                     *tview.Grid
+	profile                  *portfolio.Profile
+	marketViewer             *MarketViewer
+	profileViewer            *ProfileViewer
+	profilePerformanceViewer *PerformanceViewer
+	profileReturnViewer      *ReturnViewer
+	portfolioViewers         []*PortfolioViewer
+	performanceViewers       []*PerformanceViewer
+	returnViewers            []*ReturnViewer
+	signalRedrawMarket       chan int
+	signalRedrawProfile      chan int
+	signalRedrawPortfolio    chan int
+	signalRedrawPerformance  chan int
+	signalSwitchViewer       chan int
 }
 
 // NewTerminal returns a new terminal window
@@ -49,6 +51,9 @@ func (term *Terminal) Start() error {
 
 	profileViewer := NewProfileViewer(term.profile)
 	term.profileViewer = profileViewer
+
+	term.profilePerformanceViewer = NewPerformanceViewer(term.profile.MergedPortfolio.Performance)
+	term.profileReturnViewer = NewReturnViewer(term.profile.MergedPortfolio.Performance)
 
 	for _, portfolio := range term.profile.Portfolios {
 		portfolioViewer := NewPortfolioViewer(portfolio)
@@ -94,7 +99,7 @@ func (term *Terminal) drawHomepage() error {
 	term.drawProfile()
 
 	// The performance and return data may not have been computed yet. However, that's handled by the viewer
-	term.drawPerformance(0)
+	term.drawPerformance(-1)
 
 	return nil
 }
@@ -168,13 +173,30 @@ func (term *Terminal) drawProfile() {
 	term.profileViewer.Draw()
 }
 
-func (term *Terminal) drawPortfolio(index int) {
+func (term *Terminal) drawPortfolio(index int) error {
+	if index < 0 || index >= len(term.portfolioViewers) {
+		return errors.New("Viewer index out of range")
+	}
+
 	term.portfolioViewers[index].Draw()
+
+	return nil
 }
 
-func (term *Terminal) drawPerformance(index int) {
-	term.performanceViewers[index].Draw()
-	term.returnViewers[index].Draw()
+func (term *Terminal) drawPerformance(index int) error {
+	if index >= len(term.performanceViewers) {
+		return errors.New("Viewer index out of range")
+	}
+
+	if index < 0 {
+		term.profilePerformanceViewer.Draw()
+		term.profileReturnViewer.Draw()
+	} else {
+		term.performanceViewers[index].Draw()
+		term.returnViewers[index].Draw()
+	}
+
+	return nil
 }
 
 func (term *Terminal) refreshMarket() error {
@@ -211,8 +233,13 @@ func (term *Terminal) refreshPortfolio(index int) error {
 }
 
 func (term *Terminal) computeAllPerformance() error {
+	err := term.profile.MergedPortfolio.Performance.Compute()
+	if err != nil {
+		return err
+	}
+
 	for i := range term.profile.Portfolios {
-		err := term.computePerformance(i)
+		err = term.computePerformance(i)
 		if err != nil {
 			return err
 		}
@@ -264,11 +291,7 @@ func (term *Terminal) doRefresh() {
 
 		case <-term.signalRedrawPerformance:
 			term.application.QueueUpdateDraw(func() {
-				i := 0
-				if index >= 0 {
-					i = index
-				}
-				term.drawPerformance(i)
+				term.drawPerformance(index)
 			})
 
 		case index = <-term.signalSwitchViewer:
@@ -287,8 +310,8 @@ func (term *Terminal) setLayoutForHomepage() {
 	term.root.Clear()
 	term.root.AddItem(term.marketViewer.table, 0, 0, 1, 1, 0, 0, false).
 		AddItem(term.profileViewer.table, 1, 0, 1, 1, 0, 0, false).
-		AddItem(term.performanceViewers[0].table, 2, 0, 1, 1, 0, 0, false).
-		AddItem(term.returnViewers[0].table, 3, 0, 1, 1, 0, 0, false)
+		AddItem(term.profilePerformanceViewer.table, 2, 0, 1, 1, 0, 0, false).
+		AddItem(term.profileReturnViewer.table, 3, 0, 1, 1, 0, 0, false)
 }
 
 func (term *Terminal) setLayoutForPage(index int) {

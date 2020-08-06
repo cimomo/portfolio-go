@@ -8,11 +8,12 @@ import (
 
 // Profile contains multiple portfolios
 type Profile struct {
-	Name       string
-	CostBasis  float64
-	Market     *Market
-	Portfolios []*Portfolio
-	Status     *ProfileStatus
+	Name            string
+	CostBasis       float64
+	Market          *Market
+	Portfolios      []*Portfolio
+	MergedPortfolio *Portfolio
+	Status          *ProfileStatus
 }
 
 // ProfileStatus defines the real-time status of the entire portfolio
@@ -58,6 +59,8 @@ func (profile *Profile) Load(name string) error {
 		profile.CostBasis += portfolio.CostBasis
 	}
 
+	profile.MergedPortfolio = profile.mergePortfolios()
+
 	return nil
 }
 
@@ -68,6 +71,11 @@ func (profile *Profile) Refresh() error {
 		if err != nil {
 			return err
 		}
+	}
+
+	err := profile.MergedPortfolio.Refresh()
+	if err != nil {
+		return err
 	}
 
 	profile.RefreshStatus()
@@ -107,4 +115,22 @@ func (profile *Profile) RefreshStatus() {
 	}
 
 	profile.Status = &status
+}
+
+// MergePortfolios merges all portfolios in the profile into a single portfolio
+func (profile *Profile) mergePortfolios() *Portfolio {
+	portfolio := NewPortfolio()
+
+	portfolio.Name = profile.Name
+
+	for _, port := range profile.Portfolios {
+		portfolio.CostBasis += port.CostBasis
+		portfolio.Symbols = append(portfolio.Symbols, port.Symbols...)
+
+		for symbol, holding := range port.Holdings {
+			portfolio.Holdings[symbol] = holding
+		}
+	}
+
+	return portfolio
 }
