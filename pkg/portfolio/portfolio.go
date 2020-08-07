@@ -40,8 +40,9 @@ type holdingConfig struct {
 }
 
 type portfolioConfig struct {
-	Name     string          `yaml:"portfolio"`
-	Holdings []holdingConfig `yaml:"holdings"`
+	Name             string          `yaml:"portfolio"`
+	TargetAllocation float64         `yaml:"allocation"`
+	Holdings         []holdingConfig `yaml:"holdings"`
 }
 
 // NewPortfolio returns an empty portfolio of asset holdings

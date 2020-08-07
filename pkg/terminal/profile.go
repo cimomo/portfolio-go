@@ -59,7 +59,7 @@ func (viewer *ProfileViewer) drawProfile() {
 		setDollarChange(viewer.table, portfolio.Status.Unrealized, r, 5)
 		setPercentChange(viewer.table, portfolio.Status.UnrealizedPercent, r, 6)
 		setPercent(viewer.table, profile.Status.Allocation[portfolio.Name], r, 7, tcell.ColorWhite)
-		setPercent(viewer.table, 0.0, r, 8, tcell.ColorWhite)
+		setPercent(viewer.table, profile.TargetAllocation[portfolio.Name], r, 8, tcell.ColorWhite)
 
 		r++
 	}

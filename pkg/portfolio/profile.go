@@ -1,6 +1,7 @@
 package portfolio
 
 import (
+	"errors"
 	"io/ioutil"
 
 	"gopkg.in/yaml.v2"
@@ -8,12 +9,13 @@ import (
 
 // Profile contains multiple portfolios
 type Profile struct {
-	Name            string
-	CostBasis       float64
-	Market          *Market
-	Portfolios      []*Portfolio
-	MergedPortfolio *Portfolio
-	Status          *ProfileStatus
+	Name             string
+	CostBasis        float64
+	Market           *Market
+	Portfolios       []*Portfolio
+	TargetAllocation map[string]float64
+	MergedPortfolio  *Portfolio
+	Status           *ProfileStatus
 }
 
 // ProfileStatus defines the real-time status of the entire portfolio
@@ -31,9 +33,10 @@ type profileConfig []portfolioConfig
 // NewProfile returns an empty profile
 func NewProfile(name string) *Profile {
 	return &Profile{
-		Name:       name,
-		Market:     NewMarket(),
-		Portfolios: make([]*Portfolio, 0),
+		Name:             name,
+		Market:           NewMarket(),
+		Portfolios:       make([]*Portfolio, 0),
+		TargetAllocation: make(map[string]float64),
 	}
 }
 
@@ -51,12 +54,19 @@ func (profile *Profile) Load(name string) error {
 		return err
 	}
 
+	totalAllocation := 0.0
+
 	for _, portfolioConfig := range profileConfig {
 		portfolio := NewPortfolio()
 		portfolio.Load(portfolioConfig)
 		profile.Portfolios = append(profile.Portfolios, portfolio)
-
+		profile.TargetAllocation[portfolio.Name] = portfolioConfig.TargetAllocation
+		totalAllocation += portfolioConfig.TargetAllocation
 		profile.CostBasis += portfolio.CostBasis
+	}
+
+	if totalAllocation != 100.0 && totalAllocation != 0.0 {
+		return errors.New("Total allocation should be either 0% (ignored) or 100%")
 	}
 
 	profile.MergedPortfolio = profile.mergePortfolios()
