@@ -64,6 +64,18 @@ func (viewer *ProfileViewer) drawProfile() {
 		r++
 	}
 
+	setString(viewer.table, "Cash", r, 0, tcell.ColorWhite, tview.AlignLeft)
+	setDollarAmount(viewer.table, profile.Cash, r, 1, tcell.ColorWhite)
+	setDollarAmount(viewer.table, profile.Cash, r, 2, tcell.ColorWhite)
+	setPercentChange(viewer.table, 0, r, 3)
+	setDollarChange(viewer.table, 0, r, 4)
+	setDollarChange(viewer.table, 0, r, 5)
+	setPercentChange(viewer.table, 0, r, 6)
+	setPercent(viewer.table, profile.Status.Allocation["cash"], r, 7, tcell.ColorWhite)
+	setPercent(viewer.table, profile.TargetAllocation["cash"], r, 8, tcell.ColorWhite)
+
+	r++
+
 	setString(viewer.table, "TOTAL", r, 0, tcell.ColorYellow, tview.AlignLeft)
 	setDollarAmount(viewer.table, profile.CostBasis, r, 1, tcell.ColorYellow)
 	setDollarAmount(viewer.table, profile.Status.Value, r, 2, tcell.ColorYellow)

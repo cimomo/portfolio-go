@@ -10,6 +10,7 @@ import (
 // Profile contains multiple portfolios
 type Profile struct {
 	Name             string
+	Cash             float64
 	CostBasis        float64
 	Market           *Market
 	Portfolios       []*Portfolio
@@ -28,7 +29,15 @@ type ProfileStatus struct {
 	Allocation                 map[string]float64
 }
 
-type profileConfig []portfolioConfig
+type profileConfig struct {
+	Cash       cashConfig        `yaml:"cash"`
+	Portfolios []portfolioConfig `yaml:"portfolios"`
+}
+
+type cashConfig struct {
+	Value            float64 `yaml:"value"`
+	TargetAllocation float64 `yaml:"allocation"`
+}
 
 // NewProfile returns an empty profile
 func NewProfile(name string) *Profile {
@@ -54,9 +63,12 @@ func (profile *Profile) Load(name string) error {
 		return err
 	}
 
-	totalAllocation := 0.0
+	profile.Cash = profileConfig.Cash.Value
+	profile.CostBasis = profileConfig.Cash.Value
+	profile.TargetAllocation["cash"] = profileConfig.Cash.TargetAllocation
+	totalAllocation := profileConfig.Cash.TargetAllocation
 
-	for _, portfolioConfig := range profileConfig {
+	for _, portfolioConfig := range profileConfig.Portfolios {
 		portfolio := NewPortfolio()
 		portfolio.Load(portfolioConfig)
 		profile.Portfolios = append(profile.Portfolios, portfolio)
@@ -99,6 +111,8 @@ func (profile *Profile) RefreshStatus() {
 		Allocation: make(map[string]float64),
 	}
 
+	status.Value = profile.Cash
+
 	for _, portfolio := range profile.Portfolios {
 		status.Value += portfolio.Status.Value
 		status.RegularMarketChange += portfolio.Status.RegularMarketChange
@@ -123,6 +137,8 @@ func (profile *Profile) RefreshStatus() {
 			status.Allocation[portfolio.Name] = (portfolio.Status.Value / status.Value) * 100
 		}
 	}
+
+	status.Allocation["cash"] = (profile.Cash / status.Value) * 100
 
 	profile.Status = &status
 }
