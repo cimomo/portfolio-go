@@ -1,3 +1,6 @@
+cash:
+  value: 5000.00
+portfolios:
 - portfolio: Minimal
   holdings:
   - symbol: VTI

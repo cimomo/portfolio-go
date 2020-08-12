@@ -1,3 +1,6 @@
+cash:
+  value: 10000.00
+portfolios:
 - portfolio: Strategic
   holdings:
   - symbol: VTI
