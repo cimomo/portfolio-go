@@ -46,6 +46,22 @@ func NewTerminal(profile *portfolio.Profile) *Terminal {
 
 // Start starts the terminal application
 func (term *Terminal) Start() error {
+	term.setupViewers()
+
+	term.initializeViewer()
+
+	// Periodically refresh the market and portfolio data
+	go term.doRefresh()
+
+	err := term.application.Run()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (term *Terminal) setupViewers() {
 	marketViewer := NewMarketViewer(term.profile.Market)
 	term.marketViewer = marketViewer
 
@@ -65,18 +81,6 @@ func (term *Terminal) Start() error {
 		returnViewer := NewReturnViewer(portfolio.Performance)
 		term.returnViewers = append(term.returnViewers, returnViewer)
 	}
-
-	term.initializeViewer()
-
-	// Periodically refresh the market and portfolio data
-	go term.doRefresh()
-
-	err := term.application.Run()
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
 
 // Stop stops the terminal application
