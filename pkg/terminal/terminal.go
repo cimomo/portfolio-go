@@ -13,6 +13,7 @@ import (
 type Terminal struct {
 	application              *tview.Application
 	root                     *tview.Grid
+	profileFile              string
 	profile                  *portfolio.Profile
 	marketViewer             *MarketViewer
 	profileViewer            *ProfileViewer
@@ -29,10 +30,10 @@ type Terminal struct {
 }
 
 // NewTerminal returns a new terminal window
-func NewTerminal(profile *portfolio.Profile) *Terminal {
+func NewTerminal(profileFile string) *Terminal {
 	return &Terminal{
 		application:             tview.NewApplication(),
-		profile:                 profile,
+		profileFile:             profileFile,
 		portfolioViewers:        make([]*PortfolioViewer, 0),
 		performanceViewers:      make([]*PerformanceViewer, 0),
 		returnViewers:           make([]*ReturnViewer, 0),
@@ -46,6 +47,13 @@ func NewTerminal(profile *portfolio.Profile) *Terminal {
 
 // Start starts the terminal application
 func (term *Terminal) Start() error {
+	profile, err := term.loadProfile("Main")
+	if err != nil {
+		return err
+	}
+
+	term.profile = profile
+
 	term.setupViewers()
 
 	term.initializeViewer()
@@ -53,12 +61,23 @@ func (term *Terminal) Start() error {
 	// Periodically refresh the market and portfolio data
 	go term.doRefresh()
 
-	err := term.application.Run()
+	err = term.application.Run()
 	if err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func (term *Terminal) loadProfile(name string) (*portfolio.Profile, error) {
+	p := portfolio.NewProfile(name)
+
+	err := p.Load(term.profileFile)
+	if err != nil {
+		return nil, err
+	}
+
+	return p, nil
 }
 
 func (term *Terminal) setupViewers() {
