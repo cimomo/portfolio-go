@@ -23,9 +23,25 @@ portfolios:
     quantity: 92
     allocation: 10
     basis: 10000
-- portfolio: Minimal
+- portfolio: FAAMG
   holdings:
-  - symbol: VTI
-    quantity: 100
-    allocation: 100
-    basis: 5000
+  - symbol: FB
+    quantity: 715
+    allocation: 20
+    basis: 20000
+  - symbol: AAPL
+    quantity: 293
+    allocation: 20
+    basis: 20000
+  - symbol: AMZN
+    quantity: 78
+    allocation: 20
+    basis: 20000
+  - symbol: MSFT
+    quantity: 861
+    allocation: 20
+    basis: 20000
+  - symbol: GOOG
+    quantity: 56
+    allocation: 20
+    basis: 20000
