@@ -356,6 +356,9 @@ func computeStartAndEndDateForPortfolio(portfolio *Portfolio) (time.Time, time.T
 		}
 	}
 
+	// There is some data oddity with IPO date. We will add one day to avoid that.
+	startDate = startDate.Add(time.Hour * 24)
+
 	return startDate, now, nil
 }
 
