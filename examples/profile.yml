@@ -4,33 +4,33 @@ portfolios:
 - portfolio: Strategic
   holdings:
   - symbol: VTI
-    quantity: 428
+    quantity: 642
+    allocation: 30
+    basis: 30000
+  - symbol: QQQ
+    quantity: 480
     allocation: 20
     basis: 20000
-  - symbol: QQQ
-    quantity: 240
+  - symbol: VEU
+    quantity: 303
     allocation: 10
     basis: 10000
-  - symbol: VEU
-    quantity: 363
-    allocation: 12
-    basis: 12000
   - symbol: VWO
-    quantity: 246
-    allocation: 8
-    basis: 8000
+    quantity: 154
+    allocation: 5
+    basis: 5000
   - symbol: VNQ
-    quantity: 410
-    allocation: 12
-    basis: 12000
+    quantity: 342
+    allocation: 10
+    basis: 10000
   - symbol: VNQI
-    quantity: 237
-    allocation: 8
-    basis: 8000
+    quantity: 148
+    allocation: 5
+    basis: 5000
   - symbol: BND
-    quantity: 345
-    allocation: 20
-    basis: 20000
+    quantity: 173
+    allocation: 10
+    basis: 10000
   - symbol: GLD
     quantity: 92
     allocation: 10
