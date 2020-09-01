@@ -70,7 +70,12 @@ func (profile *Profile) Load(name string) error {
 
 	for _, portfolioConfig := range profileConfig.Portfolios {
 		portfolio := NewPortfolio()
-		portfolio.Load(portfolioConfig)
+
+		err = portfolio.Load(portfolioConfig)
+		if err != nil {
+			return err
+		}
+
 		profile.Portfolios = append(profile.Portfolios, portfolio)
 		profile.TargetAllocation[portfolio.Name] = portfolioConfig.TargetAllocation
 		totalAllocation += portfolioConfig.TargetAllocation
