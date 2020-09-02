@@ -25,6 +25,11 @@ func NewMarketViewer(market *portfolio.Market) *MarketViewer {
 	}
 }
 
+// Reload updates the market data object
+func (viewer *MarketViewer) Reload(market *portfolio.Market) {
+	viewer.market = market
+}
+
 // Draw fetches the latest market data and refreshes the viewer
 func (viewer *MarketViewer) Draw() {
 	market := viewer.market

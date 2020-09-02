@@ -20,6 +20,11 @@ func NewPortfolioViewer(portfolio *portfolio.Portfolio) *PortfolioViewer {
 	}
 }
 
+// Reload updates the portfolio data object
+func (viewer *PortfolioViewer) Reload(portfolio *portfolio.Portfolio) {
+	viewer.portfolio = portfolio
+}
+
 // Draw fetches the latest portfolio data and refreshes the viewer
 func (viewer *PortfolioViewer) Draw() {
 	viewer.drawHeader()

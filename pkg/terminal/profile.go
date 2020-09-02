@@ -20,6 +20,11 @@ func NewProfileViewer(profile *portfolio.Profile) *ProfileViewer {
 	}
 }
 
+// Reload updates the profile data object
+func (viewer *ProfileViewer) Reload(profile *portfolio.Profile) {
+	viewer.profile = profile
+}
+
 // Draw fetches the latest portfolio data and refreshes the viewer
 func (viewer *ProfileViewer) Draw() {
 	viewer.drawHeader()

@@ -69,6 +69,28 @@ func (term *Terminal) Start() error {
 	return nil
 }
 
+func (term *Terminal) reload() error {
+	profile, err := term.loadProfile("Main")
+	if err != nil {
+		return err
+	}
+
+	term.profile = profile
+
+	term.marketViewer.Reload(profile.Market)
+	term.profileViewer.Reload(profile)
+	term.profilePerformanceViewer.Reload(profile.MergedPortfolio.Performance)
+	term.profileReturnViewer.Reload(profile.MergedPortfolio.Performance)
+
+	for i, portfolio := range profile.Portfolios {
+		term.portfolioViewers[i].Reload(portfolio)
+		term.performanceViewers[i].Reload(portfolio.Performance)
+		term.returnViewers[i].Reload(portfolio.Performance)
+	}
+
+	return nil
+}
+
 func (term *Terminal) loadProfile(name string) (*portfolio.Profile, error) {
 	p := portfolio.NewProfile(name)
 

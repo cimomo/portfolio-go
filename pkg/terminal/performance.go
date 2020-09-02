@@ -20,6 +20,11 @@ func NewPerformanceViewer(performance *portfolio.Performance) *PerformanceViewer
 	}
 }
 
+// Reload updates the performance data object
+func (viewer *PerformanceViewer) Reload(performance *portfolio.Performance) {
+	viewer.performance = performance
+}
+
 // Draw calculates the portfolio performance and refreshes the viewer
 func (viewer *PerformanceViewer) Draw() {
 	viewer.drawHeader()
