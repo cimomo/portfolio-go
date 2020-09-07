@@ -88,6 +88,13 @@ func (term *Terminal) reload() error {
 		term.returnViewers[i].Reload(portfolio.Performance)
 	}
 
+	err = term.drawHomepage()
+	if err != nil {
+		return err
+	}
+
+	go term.computeAllPerformance()
+
 	return nil
 }
 
