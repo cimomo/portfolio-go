@@ -88,7 +88,7 @@ func (term *Terminal) reload() error {
 		term.returnViewers[i].Reload(portfolio.Performance)
 	}
 
-	err = term.drawHomepage()
+	err = term.switchViewer(-1)
 	if err != nil {
 		return err
 	}
@@ -388,6 +388,10 @@ func (term *Terminal) keyCapture(event *tcell.EventKey) *tcell.EventKey {
 
 		} else if rune == 'h' {
 			term.switchViewer(-1)
+			return nil
+
+		} else if rune == 'r' {
+			term.reload()
 			return nil
 		}
 	}
