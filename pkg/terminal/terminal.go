@@ -197,23 +197,6 @@ func (term *Terminal) switchViewer(index int) error {
 
 	term.signalSwitchViewer <- index
 
-	if index < 0 {
-		term.setLayoutForHomepage()
-
-		err := term.drawHomepage()
-		if err != nil {
-			return err
-		}
-
-	} else {
-		term.setLayoutForPage(index)
-
-		err := term.drawPage(index)
-		if err != nil {
-			return err
-		}
-	}
-
 	return nil
 }
 
@@ -347,6 +330,16 @@ func (term *Terminal) doRefresh() {
 			})
 
 		case index = <-term.signalSwitchViewer:
+			term.application.QueueUpdateDraw(func() {
+				if index < 0 {
+					term.setLayoutForHomepage()
+					term.drawHomepage()
+
+				} else {
+					term.setLayoutForPage(index)
+					term.drawPage(index)
+				}
+			})
 		}
 	}
 }
