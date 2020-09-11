@@ -22,6 +22,7 @@ type Terminal struct {
 	portfolioViewers         []*PortfolioViewer
 	performanceViewers       []*PerformanceViewer
 	returnViewers            []*ReturnViewer
+	currentViewer            int
 	signalRedrawMarket       chan int
 	signalRedrawProfile      chan int
 	signalRedrawPortfolio    chan int
@@ -37,6 +38,7 @@ func NewTerminal(profileFile string) *Terminal {
 		portfolioViewers:        make([]*PortfolioViewer, 0),
 		performanceViewers:      make([]*PerformanceViewer, 0),
 		returnViewers:           make([]*ReturnViewer, 0),
+		currentViewer:           -1,
 		signalRedrawMarket:      make(chan int),
 		signalRedrawPortfolio:   make(chan int),
 		signalRedrawProfile:     make(chan int),
@@ -88,7 +90,7 @@ func (term *Terminal) reload() error {
 		term.returnViewers[i].Reload(portfolio.Performance)
 	}
 
-	err = term.switchViewer(-1)
+	err = term.switchViewer(term.currentViewer)
 	if err != nil {
 		return err
 	}
@@ -296,17 +298,16 @@ func (term *Terminal) computePerformance(index int) error {
 
 func (term *Terminal) doRefresh() {
 	ticker := time.NewTicker(time.Second * 10)
-	index := -1
 
 	for {
 		select {
 		case <-ticker.C:
 			go term.refreshMarket()
 
-			if index < 0 {
+			if term.currentViewer < 0 {
 				go term.refreshProfile()
 			} else {
-				go term.refreshPortfolio(index)
+				go term.refreshPortfolio(term.currentViewer)
 			}
 
 		case <-term.signalRedrawMarket:
@@ -321,15 +322,16 @@ func (term *Terminal) doRefresh() {
 
 		case <-term.signalRedrawPortfolio:
 			term.application.QueueUpdateDraw(func() {
-				term.drawPortfolio(index)
+				term.drawPortfolio(term.currentViewer)
 			})
 
 		case <-term.signalRedrawPerformance:
 			term.application.QueueUpdateDraw(func() {
-				term.drawPerformance(index)
+				term.drawPerformance(term.currentViewer)
 			})
 
-		case index = <-term.signalSwitchViewer:
+		case index := <-term.signalSwitchViewer:
+			term.currentViewer = index
 			term.application.QueueUpdateDraw(func() {
 				if index < 0 {
 					term.setLayoutForHomepage()
