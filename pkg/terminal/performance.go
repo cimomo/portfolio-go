@@ -27,6 +27,7 @@ func (viewer *PerformanceViewer) Reload(performance *portfolio.Performance) {
 
 // Draw calculates the portfolio performance and refreshes the viewer
 func (viewer *PerformanceViewer) Draw() {
+	viewer.table.Clear()
 	viewer.drawHeader()
 	viewer.drawPerformance()
 }
@@ -52,9 +53,6 @@ func (viewer *PerformanceViewer) drawHeader() {
 
 func (viewer *PerformanceViewer) drawPerformance() {
 	if !viewer.performance.Ready {
-		viewer.table.Clear()
-		viewer.drawHeader()
-
 		setString(viewer.table, "Computing ...", 1, 0, tcell.ColorWhite, tview.AlignLeft)
 		setString(viewer.table, "Computing ...", 2, 0, tcell.ColorWhite, tview.AlignLeft)
 		return
