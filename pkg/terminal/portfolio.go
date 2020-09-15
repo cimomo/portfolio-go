@@ -27,6 +27,7 @@ func (viewer *PortfolioViewer) Reload(portfolio *portfolio.Portfolio) {
 
 // Draw fetches the latest portfolio data and refreshes the viewer
 func (viewer *PortfolioViewer) Draw() {
+	viewer.table.Clear()
 	viewer.drawHeader()
 	viewer.drawPortfolio()
 }
