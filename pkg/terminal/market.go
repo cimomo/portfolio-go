@@ -32,6 +32,7 @@ func (viewer *MarketViewer) Reload(market *portfolio.Market) {
 
 // Draw fetches the latest market data and refreshes the viewer
 func (viewer *MarketViewer) Draw() {
+	viewer.table.Clear()
 	market := viewer.market
 
 	viewer.drawIndex("Dow 30", market.Dow, 0)
