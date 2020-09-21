@@ -14,6 +14,7 @@ type Holding struct {
 	Asset     *Asset
 	Quantity  float64
 	CostBasis float64
+	Watch     float64
 	Quote     *finance.Quote
 	Status    *HoldingStatus
 }
