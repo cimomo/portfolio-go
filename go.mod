@@ -5,9 +5,11 @@ go 1.14
 require github.com/piquette/finance-go v1.0.0
 
 require (
-	github.com/gdamore/tcell v1.3.0
-	github.com/rivo/tview v0.0.0-20200414130344-8e06c826b3a5
-	github.com/shopspring/decimal v0.0.0-20200227202807-02e2044944cc // indirect
-	golang.org/x/text v0.3.2
-	gopkg.in/yaml.v2 v2.2.8
+	github.com/gdamore/tcell v1.4.0
+	github.com/rivo/tview v0.0.0-20200915114512-42866ecf6ca6
+	github.com/shopspring/decimal v1.2.0 // indirect
+	github.com/stretchr/testify v1.6.1 // indirect
+	golang.org/x/sys v0.0.0-20200918174421-af09f7315aff // indirect
+	golang.org/x/text v0.3.3
+	gopkg.in/yaml.v2 v2.3.0
 )
