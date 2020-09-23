@@ -27,11 +27,12 @@ type HoldingStatus struct {
 }
 
 // NewHolding returns a new holding object
-func NewHolding(symbol string, quantity float64, basis float64) *Holding {
+func NewHolding(symbol string, quantity float64, basis float64, watch float64) *Holding {
 	return &Holding{
 		Asset:     NewAsset(symbol),
 		Quantity:  quantity,
 		CostBasis: basis,
+		Watch:     watch,
 		Quote:     &finance.Quote{},
 		Status:    &HoldingStatus{},
 	}

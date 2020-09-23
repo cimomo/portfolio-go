@@ -37,6 +37,7 @@ type holdingConfig struct {
 	TargetAllocation float64 `yaml:"allocation"`
 	Quantity         float64 `yaml:"quantity"`
 	CostBasis        float64 `yaml:"basis"`
+	Watch            float64 `yaml:"watch"`
 }
 
 type portfolioConfig struct {
@@ -73,7 +74,8 @@ func (portfolio *Portfolio) Load(config portfolioConfig) error {
 		portfolio.Holdings[holdingConfig.Symbol] = NewHolding(
 			holdingConfig.Symbol,
 			holdingConfig.Quantity,
-			holdingConfig.CostBasis)
+			holdingConfig.CostBasis,
+			holdingConfig.Watch)
 		portfolio.TargetAllocation[holdingConfig.Symbol] = holdingConfig.TargetAllocation
 		totalAllocation += holdingConfig.TargetAllocation
 		portfolio.CostBasis += holdingConfig.CostBasis

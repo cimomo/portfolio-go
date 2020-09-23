@@ -316,7 +316,7 @@ func computeNormalizedPortfolio(portfolio *Portfolio) *Portfolio {
 }
 
 func computeBenchmark(symbol string) *Portfolio {
-	holding := NewHolding(symbol, 0, 0)
+	holding := NewHolding(symbol, 0, 0, 0)
 
 	benchmark := NewPortfolio()
 
