@@ -9,6 +9,17 @@ import (
 	"golang.org/x/text/message"
 )
 
+func setDollarAmountAgainstWatch(table *tview.Table, value float64, watch float64, r int, c int) {
+	if watch > 0 && value <= (watch*1.1) {
+		formatter := "$%.2f ($%.2f)"
+		printer := message.NewPrinter(language.English)
+		s := printer.Sprintf(formatter, value, watch)
+		setString(table, s, r, c, tcell.ColorOrange, tview.AlignRight)
+	} else {
+		setDollarAmount(table, value, r, c, tcell.ColorWhite)
+	}
+}
+
 func setPercentChange(table *tview.Table, value float64, r int, c int) {
 	color := tcell.ColorGreen
 	if value < 0 {
