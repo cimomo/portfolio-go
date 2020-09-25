@@ -50,7 +50,7 @@ portfolios:
     allocation: 20
     basis: 20000
   - symbol: AAPL
-    quantity: 293
+    quantity: 1172
     allocation: 20
     basis: 20000
   - symbol: AMZN
