@@ -1,7 +1,9 @@
 cash:
   value: 10000.00
+  allocation: 10
 portfolios:
 - portfolio: Strategic
+  allocation: 50
   holdings:
   - symbol: VTI
     quantity: 535
@@ -44,6 +46,7 @@ portfolios:
     allocation: 10
     basis: 10000
 - portfolio: FAAMG
+  allocation: 40
   holdings:
   - symbol: FB
     quantity: 715
