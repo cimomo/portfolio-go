@@ -35,10 +35,10 @@ func (viewer *PortfolioViewer) Draw() {
 func (viewer *PortfolioViewer) drawHeader() {
 	var cell *tview.TableCell
 	header := []string{
-		"SYMBOL", "CLASS", "QUANTITY", "PRICE",
+		"SYMBOL", "CLASS", "QUANTITY", "PRICE", "WATCH",
 		"1-DAY CHANGE$", "1-DAY CHANGE%",
 		"VALUE", "1-Day VALUE CHANGE$",
-		"UNREALIZED GAIN/LOSS$", "UNREALIZED GAIN/LOSS%",
+		"UNREALIZED$", "UNREALIZED%",
 		"ALLOCATION", "TARGET",
 	}
 
@@ -64,24 +64,25 @@ func (viewer *PortfolioViewer) drawPortfolio() {
 		setString(viewer.table, string(holding.Asset.Subclass), r, 1, tcell.ColorWhite, tview.AlignLeft)
 		setQuantity(viewer.table, holding.Quantity, r, 2, tview.AlignCenter)
 		setDollarAmountAgainstWatch(viewer.table, holding.Quote.RegularMarketPrice, holding.Watch, r, 3)
-		setDollarChange(viewer.table, holding.Quote.RegularMarketChange, r, 4)
-		setPercentChange(viewer.table, holding.Quote.RegularMarketChangePercent, r, 5)
-		setDollarAmount(viewer.table, holding.Status.Value, r, 6, tcell.ColorWhite)
-		setDollarChange(viewer.table, holding.Quote.RegularMarketChange*holding.Quantity, r, 7)
-		setDollarChange(viewer.table, holding.Status.Unrealized, r, 8)
-		setPercentChange(viewer.table, holding.Status.UnrealizedPercent, r, 9)
-		setPercent(viewer.table, port.Status.Allocation[symbol], r, 10, tcell.ColorWhite)
-		setPercent(viewer.table, port.TargetAllocation[symbol], r, 11, tcell.ColorWhite)
+		setDollarAmount(viewer.table, holding.Watch, r, 4, tcell.ColorWhite)
+		setDollarChange(viewer.table, holding.Quote.RegularMarketChange, r, 5)
+		setPercentChange(viewer.table, holding.Quote.RegularMarketChangePercent, r, 6)
+		setDollarAmount(viewer.table, holding.Status.Value, r, 7, tcell.ColorWhite)
+		setDollarChange(viewer.table, holding.Quote.RegularMarketChange*holding.Quantity, r, 8)
+		setDollarChange(viewer.table, holding.Status.Unrealized, r, 9)
+		setPercentChange(viewer.table, holding.Status.UnrealizedPercent, r, 10)
+		setPercent(viewer.table, port.Status.Allocation[symbol], r, 11, tcell.ColorWhite)
+		setPercent(viewer.table, port.TargetAllocation[symbol], r, 12, tcell.ColorWhite)
 
 		r++
 	}
 
 	setString(viewer.table, "TOTAL", r, 0, tcell.ColorYellow, tview.AlignLeft)
-	setPercentChange(viewer.table, port.Status.RegularMarketChangePercent, r, 5)
-	setDollarAmount(viewer.table, port.Status.Value, r, 6, tcell.ColorYellow)
-	setDollarChange(viewer.table, port.Status.RegularMarketChange, r, 7)
-	setDollarChange(viewer.table, port.Status.Unrealized, r, 8)
-	setPercentChange(viewer.table, port.Status.UnrealizedPercent, r, 9)
-	setPercent(viewer.table, 100.0, r, 10, tcell.ColorYellow)
+	setPercentChange(viewer.table, port.Status.RegularMarketChangePercent, r, 6)
+	setDollarAmount(viewer.table, port.Status.Value, r, 7, tcell.ColorYellow)
+	setDollarChange(viewer.table, port.Status.RegularMarketChange, r, 8)
+	setDollarChange(viewer.table, port.Status.Unrealized, r, 9)
+	setPercentChange(viewer.table, port.Status.UnrealizedPercent, r, 10)
 	setPercent(viewer.table, 100.0, r, 11, tcell.ColorYellow)
+	setPercent(viewer.table, 100.0, r, 12, tcell.ColorYellow)
 }
