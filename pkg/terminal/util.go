@@ -9,6 +9,15 @@ import (
 	"golang.org/x/text/message"
 )
 
+func setNonZeroDollarAmount(table *tview.Table, value float64, r int, c int, color tcell.Color) {
+	if value == 0 {
+		setString(table, "-", r, c, color, tview.AlignRight)
+
+	} else {
+		setDollarAmount(table, value, r, c, color)
+	}
+}
+
 func setDollarAmountAgainstWatch(table *tview.Table, value float64, watch float64, r int, c int) {
 	if watch > 0 && value <= (watch*1.1) {
 		setDollarAmount(table, value, r, c, tcell.ColorOrange)

@@ -64,7 +64,7 @@ func (viewer *PortfolioViewer) drawPortfolio() {
 		setString(viewer.table, string(holding.Asset.Subclass), r, 1, tcell.ColorWhite, tview.AlignLeft)
 		setQuantity(viewer.table, holding.Quantity, r, 2, tview.AlignCenter)
 		setDollarAmountAgainstWatch(viewer.table, holding.Quote.RegularMarketPrice, holding.Watch, r, 3)
-		setDollarAmount(viewer.table, holding.Watch, r, 4, tcell.ColorWhite)
+		setNonZeroDollarAmount(viewer.table, holding.Watch, r, 4, tcell.ColorWhite)
 		setDollarChange(viewer.table, holding.Quote.RegularMarketChange, r, 5)
 		setPercentChange(viewer.table, holding.Quote.RegularMarketChangePercent, r, 6)
 		setDollarAmount(viewer.table, holding.Status.Value, r, 7, tcell.ColorWhite)
