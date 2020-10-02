@@ -73,3 +73,5 @@ portfolios:
     allocation: 20
     basis: 20000
     watch: 1400
+  - symbol: TSLA
+    watch: 350
