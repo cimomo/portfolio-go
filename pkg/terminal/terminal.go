@@ -346,6 +346,16 @@ func (term *Terminal) doRefresh() {
 	}
 }
 
+func (term *Terminal) showHelp() {
+	help := tview.NewModal().
+		SetText("Help").
+		AddButtons([]string{"Got it!"}).
+		SetDoneFunc(func(buttonIndex int, buttonLabel string) {
+			term.application.SetRoot(term.root, true)
+		})
+	term.application.SetRoot(help, false)
+}
+
 func (term *Terminal) initializeLayout() {
 	grid := tview.NewGrid().SetRows(4, 0, 8, 7).SetColumns(0).SetBorders(false)
 	term.application.SetRoot(grid, true).SetInputCapture(term.keyCapture)
@@ -383,6 +393,10 @@ func (term *Terminal) keyCapture(event *tcell.EventKey) *tcell.EventKey {
 
 		} else if rune == 'm' {
 			term.switchViewer(-1)
+			return nil
+
+		} else if rune == 'h' {
+			term.showHelp()
 			return nil
 
 		} else if rune == 'r' {
