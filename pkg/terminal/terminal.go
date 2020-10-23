@@ -348,11 +348,12 @@ func (term *Terminal) doRefresh() {
 
 func (term *Terminal) showHelp() {
 	help := tview.NewModal().
-		SetText("Help").
+		SetText("Help\n\n<h> This help menu\n<0>/<m> Home page\n<1>...<9> Switch to portfolio\n<r> Reload profile\n<q>/<Ctrl+c> Exit").
 		AddButtons([]string{"Got it!"}).
 		SetDoneFunc(func(buttonIndex int, buttonLabel string) {
 			term.application.SetRoot(term.root, true)
 		})
+	help.SetTitle("Help")
 	term.application.SetRoot(help, false)
 }
 
