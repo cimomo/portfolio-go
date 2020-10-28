@@ -18,7 +18,7 @@ test:
 compile:
 	GOOS=darwin GOARCH=amd64 go build -o bin/$(TARGET)-darwin $(SOURCE)
 	GOOS=linux GOARCH=amd64 go build -o bin/$(TARGET)-linux $(SOURCE)
-	GOOS=windows GOARCH=amd64 go build -o bin/$(TARGET)-windows $(SOURCE)
+	GOOS=windows GOARCH=amd64 go build -o bin/$(TARGET)-windows.exe $(SOURCE)
 
 clean:
 	rm $(TARGET)
