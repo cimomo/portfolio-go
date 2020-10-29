@@ -12,7 +12,7 @@ import (
 // Terminal defines the main terminal window for portfolio visualization
 type Terminal struct {
 	application              *tview.Application
-	root                     *tview.Grid
+	root                     *tview.Pages
 	profileFile              string
 	profile                  *portfolio.Profile
 	marketViewer             *MarketViewer
@@ -179,7 +179,7 @@ func (term *Terminal) drawPage(index int) error {
 }
 
 func (term *Terminal) initializeViewer() error {
-	term.initializeLayout()
+	term.initialize()
 
 	err := term.drawHomepage()
 	if err != nil {
@@ -334,11 +334,11 @@ func (term *Terminal) doRefresh() {
 			term.currentViewer = index
 			term.application.QueueUpdateDraw(func() {
 				if index < 0 {
-					term.setLayoutForHomepage()
+					term.root.SwitchToPage(term.profile.Name)
 					term.drawHomepage()
 
 				} else {
-					term.setLayoutForPage(index)
+					term.root.SwitchToPage(term.portfolioViewers[index].portfolio.Name)
 					term.drawPage(index)
 				}
 			})
@@ -357,27 +357,41 @@ func (term *Terminal) showHelp() {
 	term.application.SetRoot(help, false)
 }
 
-func (term *Terminal) initializeLayout() {
-	grid := tview.NewGrid().SetRows(4, 0, 8, 7).SetColumns(0).SetBorders(false)
-	term.application.SetRoot(grid, true).SetInputCapture(term.keyCapture)
-	term.root = grid
-	term.setLayoutForHomepage()
+func (term *Terminal) initialize() {
+	pages := tview.NewPages()
+
+	homepage := term.createHomepage()
+	pages.AddPage(term.profile.Name, homepage, true, true)
+
+	for i := range term.portfolioViewers {
+		page := term.createPage(i)
+		pages.AddPage(term.portfolioViewers[i].portfolio.Name, page, true, false)
+	}
+
+	term.application.SetRoot(pages, true).SetInputCapture(term.keyCapture)
+	term.root = pages
 }
 
-func (term *Terminal) setLayoutForHomepage() {
-	term.root.Clear()
-	term.root.AddItem(term.marketViewer.table, 0, 0, 1, 1, 0, 0, false).
+func (term *Terminal) createHomepage() *tview.Grid {
+	grid := tview.NewGrid().SetRows(4, 0, 8, 7).SetColumns(0).SetBorders(false)
+
+	grid.AddItem(term.marketViewer.table, 0, 0, 1, 1, 0, 0, false).
 		AddItem(term.profileViewer.table, 1, 0, 1, 1, 0, 0, false).
 		AddItem(term.profilePerformanceViewer.table, 2, 0, 1, 1, 0, 0, false).
 		AddItem(term.profileReturnViewer.table, 3, 0, 1, 1, 0, 0, false)
+
+	return grid
 }
 
-func (term *Terminal) setLayoutForPage(index int) {
-	term.root.Clear()
-	term.root.AddItem(term.marketViewer.table, 0, 0, 1, 1, 0, 0, false).
+func (term *Terminal) createPage(index int) *tview.Grid {
+	grid := tview.NewGrid().SetRows(4, 0, 8, 7).SetColumns(0).SetBorders(false)
+
+	grid.AddItem(term.marketViewer.table, 0, 0, 1, 1, 0, 0, false).
 		AddItem(term.portfolioViewers[index].table, 1, 0, 1, 1, 0, 0, false).
 		AddItem(term.performanceViewers[index].table, 2, 0, 1, 1, 0, 0, false).
 		AddItem(term.returnViewers[index].table, 3, 0, 1, 1, 0, 0, false)
+
+	return grid
 }
 
 func (term *Terminal) keyCapture(event *tcell.EventKey) *tcell.EventKey {
