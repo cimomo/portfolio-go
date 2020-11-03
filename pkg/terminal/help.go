@@ -21,7 +21,7 @@ func NewHelpViewer() *HelpViewer {
 			"r":        "Reload profile",
 			"q/Ctrl+c": "Exit",
 		},
-		table: tview.NewTable().SetBorders(false),
+		table: tview.NewTable().SetBorders(true),
 	}
 }
 
@@ -33,5 +33,6 @@ func (viewer *HelpViewer) Draw() {
 	for k, v := range viewer.help {
 		setString(viewer.table, k, r, 0, tcell.ColorWhite, tview.AlignRight)
 		setString(viewer.table, v, r, 1, tcell.ColorWhite, tview.AlignLeft)
+		r++
 	}
 }
