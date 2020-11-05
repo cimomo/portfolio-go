@@ -22,6 +22,7 @@ type Terminal struct {
 	portfolioViewers         []*PortfolioViewer
 	performanceViewers       []*PerformanceViewer
 	returnViewers            []*ReturnViewer
+	helpViewer               *HelpViewer
 	currentViewer            int
 	signalRedrawMarket       chan int
 	signalRedrawProfile      chan int
@@ -131,6 +132,9 @@ func (term *Terminal) setupViewers() {
 		returnViewer := NewReturnViewer(portfolio.Performance)
 		term.returnViewers = append(term.returnViewers, returnViewer)
 	}
+
+	helpViewer := NewHelpViewer()
+	term.helpViewer = helpViewer
 }
 
 // Stop stops the terminal application
@@ -185,6 +189,8 @@ func (term *Terminal) initializeViewer() error {
 	if err != nil {
 		return err
 	}
+
+	term.helpViewer.Draw()
 
 	// This will lazily compute the performance and return data
 	go term.computeAllPerformance()
@@ -347,14 +353,17 @@ func (term *Terminal) doRefresh() {
 }
 
 func (term *Terminal) showHelp() {
-	help := tview.NewModal().
-		SetText("Help\n\n<h> This help menu\n<0>/<m> Home page\n<1>...<9> Switch to portfolio\n<r> Reload profile\n<q>/<Ctrl+c> Exit").
-		AddButtons([]string{"Got it!"}).
-		SetDoneFunc(func(buttonIndex int, buttonLabel string) {
-			term.application.SetRoot(term.root, true)
-		})
-	help.SetTitle("Help")
-	term.application.SetRoot(help, false)
+	modal := func(p tview.Primitive, width, height int) tview.Primitive {
+		return tview.NewFlex().
+			AddItem(nil, 0, 1, false).
+			AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
+				AddItem(nil, 0, 1, false).
+				AddItem(p, height, 1, false).
+				AddItem(nil, 0, 1, false), width, 1, false).
+			AddItem(nil, 0, 1, false)
+	}
+
+	term.root.AddPage("help", modal(term.helpViewer.table, 60, 15), true, true)
 }
 
 func (term *Terminal) initialize() {
