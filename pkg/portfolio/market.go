@@ -20,7 +20,8 @@ const (
 	Gold        string = "GC=F"
 	Silver      string = "SI=F"
 	Oil         string = "CL=F"
-	Bitcoin     string = "BTC-USD"
+	Bitcoin     string = "BTCUSD=X"
+	Ethereum    string = "ETHUSD=X"
 )
 
 // Market defines the broader market indices we track
@@ -37,6 +38,7 @@ type Market struct {
 	Silver      *finance.Index
 	Oil         *finance.Index
 	Bitcoin     *finance.Index
+	Ethereum    *finance.Index
 }
 
 // NewMarket returns a new market
@@ -47,7 +49,7 @@ func NewMarket() *Market {
 // Refresh fetches the latest quotes for the market indices
 func (market *Market) Refresh() error {
 	indices := []string{
-		Dow, SP500, Nasdaq, Russell2000, Foreign, China, USBond, Treasury10, Gold, Silver, Oil, Bitcoin,
+		Dow, SP500, Nasdaq, Russell2000, Foreign, China, USBond, Treasury10, Gold, Silver, Oil, Bitcoin, Ethereum,
 	}
 
 	result := index.List(indices)
@@ -84,6 +86,8 @@ func (market *Market) Refresh() error {
 			market.Oil = index
 		case Bitcoin:
 			market.Bitcoin = index
+		case Ethereum:
+			market.Ethereum = index
 		default:
 			return fmt.Errorf("Unknown symbol: %s", index.Symbol)
 		}

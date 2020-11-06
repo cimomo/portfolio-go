@@ -47,6 +47,7 @@ func (viewer *MarketViewer) Draw() {
 	viewer.drawIndex("Silver", market.Silver, 9)
 	viewer.drawIndex("Crude Oil", market.Oil, 10)
 	viewer.drawIndex("Bitcoin", market.Bitcoin, 11)
+	viewer.drawIndex("Ethereum", market.Ethereum, 12)
 }
 
 func (viewer *MarketViewer) drawIndex(name string, index *finance.Index, c int) {
