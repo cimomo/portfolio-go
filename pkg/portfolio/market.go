@@ -18,7 +18,6 @@ const (
 	USBond      string = "BND"
 	Treasury10  string = "^TNX"
 	Gold        string = "GC=F"
-	Silver      string = "SI=F"
 	Oil         string = "CL=F"
 	Bitcoin     string = "BTCUSD=X"
 	Ethereum    string = "ETHUSD=X"
@@ -35,7 +34,6 @@ type Market struct {
 	USBond      *finance.Index
 	Treasury10  *finance.Index
 	Gold        *finance.Index
-	Silver      *finance.Index
 	Oil         *finance.Index
 	Bitcoin     *finance.Index
 	Ethereum    *finance.Index
@@ -49,7 +47,7 @@ func NewMarket() *Market {
 // Refresh fetches the latest quotes for the market indices
 func (market *Market) Refresh() error {
 	indices := []string{
-		Dow, SP500, Nasdaq, Russell2000, Foreign, China, USBond, Treasury10, Gold, Silver, Oil, Bitcoin, Ethereum,
+		Dow, SP500, Nasdaq, Russell2000, Foreign, China, USBond, Treasury10, Gold, Oil, Bitcoin, Ethereum,
 	}
 
 	result := index.List(indices)
@@ -80,8 +78,6 @@ func (market *Market) Refresh() error {
 			market.Treasury10 = index
 		case Gold:
 			market.Gold = index
-		case Silver:
-			market.Silver = index
 		case Oil:
 			market.Oil = index
 		case Bitcoin:
