@@ -404,7 +404,8 @@ func (term *Terminal) createPage(index int) *tview.Grid {
 }
 
 func (term *Terminal) keyCapture(event *tcell.EventKey) *tcell.EventKey {
-	if event.Key() == tcell.KeyRune {
+	key := event.Key()
+	if key == tcell.KeyRune {
 		rune := event.Rune()
 		if rune == 'q' {
 			term.Stop()
@@ -426,6 +427,11 @@ func (term *Terminal) keyCapture(event *tcell.EventKey) *tcell.EventKey {
 		} else if rune == 'r' {
 			term.reload()
 			return nil
+		}
+
+	} else if key == tcell.KeyEnter {
+		if term.root.HasPage("help") {
+			term.root.RemovePage("help")
 		}
 	}
 
