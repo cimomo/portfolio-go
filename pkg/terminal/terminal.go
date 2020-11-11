@@ -363,7 +363,7 @@ func (term *Terminal) showHelp() {
 			AddItem(nil, 0, 1, false)
 	}
 
-	term.root.AddPage("help", modal(term.helpViewer.table, 60, 15), true, true)
+	term.root.AddPage(helpPage, modal(term.helpViewer.table, 60, 15), true, true)
 }
 
 func (term *Terminal) initialize() {
@@ -430,8 +430,8 @@ func (term *Terminal) keyCapture(event *tcell.EventKey) *tcell.EventKey {
 		}
 
 	} else if key == tcell.KeyEnter {
-		if term.root.HasPage("help") {
-			term.root.RemovePage("help")
+		if term.root.HasPage(helpPage) {
+			term.root.RemovePage(helpPage)
 		}
 	}
 

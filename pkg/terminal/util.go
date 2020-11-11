@@ -9,6 +9,10 @@ import (
 	"golang.org/x/text/message"
 )
 
+const (
+	helpPage = "help"
+)
+
 func setNonZeroDollarAmount(table *tview.Table, value float64, r int, c int, color tcell.Color) {
 	if value == 0 {
 		setString(table, "-", r, c, color, tview.AlignRight)
