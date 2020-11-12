@@ -366,6 +366,12 @@ func (term *Terminal) showHelp() {
 	term.root.AddPage(helpPage, modal(term.helpViewer.table, 60, 15), true, true)
 }
 
+func (term *Terminal) hideHelp() {
+	if term.root.HasPage(helpPage) {
+		term.root.RemovePage(helpPage)
+	}
+}
+
 func (term *Terminal) initialize() {
 	pages := tview.NewPages()
 
@@ -430,9 +436,7 @@ func (term *Terminal) keyCapture(event *tcell.EventKey) *tcell.EventKey {
 		}
 
 	} else if key == tcell.KeyEnter {
-		if term.root.HasPage(helpPage) {
-			term.root.RemovePage(helpPage)
-		}
+		term.hideHelp()
 	}
 
 	return event
