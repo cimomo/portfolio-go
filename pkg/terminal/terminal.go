@@ -419,10 +419,12 @@ func (term *Terminal) keyCapture(event *tcell.EventKey) *tcell.EventKey {
 
 		} else if rune >= '0' && rune <= '9' { // Note that '0' will open the main profile page
 			index := int(rune - '1')
+			term.hideHelp()
 			term.switchViewer(index)
 			return nil
 
 		} else if rune == 'm' {
+			term.hideHelp()
 			term.switchViewer(-1)
 			return nil
 
@@ -431,6 +433,7 @@ func (term *Terminal) keyCapture(event *tcell.EventKey) *tcell.EventKey {
 			return nil
 
 		} else if rune == 'r' {
+			term.hideHelp()
 			term.reload()
 			return nil
 		}
