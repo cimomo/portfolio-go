@@ -42,9 +42,13 @@ portfolios:
     allocation: 10
     basis: 10000
   - symbol: GLD
-    quantity: 92
-    allocation: 10
-    basis: 10000
+    quantity: 46
+    allocation: 5
+    basis: 5000
+  - symbol: BTCUSD=X
+    quantity: 1
+    allocation: 5
+    basis: 5000
 - portfolio: FAAMG
   allocation: 40
   holdings:
