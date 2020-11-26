@@ -7,3 +7,9 @@
 A terminal based portfolio tracking, analysis and optimization tool implemented in Go. One screenshot is worth a thousand words:
 
 ![Screenshot](./examples/screenshots/strategic.png "Portfolio-go screenshot")
+
+## Running portfolio-go
+
+```
+portfolio --profile <path-to-profile>
+```
