@@ -8,8 +8,46 @@ A terminal based portfolio tracking, analysis and optimization tool implemented 
 
 ![Screenshot](./examples/screenshots/strategic.png "Portfolio-go screenshot")
 
-## Running portfolio-go
+## Using portfolio-go
 
+Start the program by running:
 ```
 portfolio --profile <path-to-profile>
 ```
+
+Here is a sample profile:
+```
+cash:
+  value: 10000.00
+  allocation: 10
+portfolios:
+- portfolio: FAAMG
+  allocation: 90
+  holdings:
+  - symbol: FB
+    quantity: 715
+    allocation: 20
+    basis: 20000
+    watch: 230
+  - symbol: AAPL
+    quantity: 1172
+    allocation: 20
+    basis: 20000
+    watch: 100
+  - symbol: AMZN
+    quantity: 78
+    allocation: 20
+    basis: 20000
+    watch: 2800
+  - symbol: MSFT
+    quantity: 861
+    allocation: 20
+    basis: 20000
+    watch: 200
+  - symbol: GOOG
+    quantity: 56
+    allocation: 20
+    basis: 20000
+    watch: 1400
+```
+More examples can be found [here](examples/).
