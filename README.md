@@ -51,3 +51,30 @@ portfolios:
     watch: 1400
 ```
 More examples can be found [here](examples/).
+
+## Features
+
+### Multi-Portfolio Support
+
+Oftentimes, it is helpful to structure the overall portfolio into multiple sub-portfolios, possibly with different goals and strategies. Here is a sample configuration in the profile:
+
+```
+cash:
+  value: 10000.00
+  allocation: 10
+portfolios:
+- portfolio: Strategic
+  allocation: 50
+  holdings:
+    ...
+- portfolio: FAAMG
+  allocation: 40
+  holdings:
+    ...
+```
+
+Notice that you may specify target allocations across different portfolios, as well as a cash allocation. When running Portfolio-go, press `m` or `0` to go to the profile homepage. Press `1` - `9` to switch between different portfolios. (This does mean that we support a maximum of 9 portfolios.)
+
+Here is what the profile homepage may look like:
+
+![Profile](./examples/screenshots/profile.png "Profile homepage")
