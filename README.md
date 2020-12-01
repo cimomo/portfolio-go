@@ -15,7 +15,7 @@ Start the program by running:
 portfolio --profile <path-to-profile>
 ```
 
-Here is a sample profile:
+Portfolios are described using a YAML file. Here is an example:
 ```
 cash:
   value: 10000.00
