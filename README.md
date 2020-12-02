@@ -78,3 +78,9 @@ Notice that you may specify target allocations across different portfolios, as w
 Here is what the profile homepage may look like:
 
 ![Profile](./examples/screenshots/profile.png "Profile homepage")
+
+### Market Data
+
+We track the major indices and markets, as well as key commodity prices. We view crypto currency as a viable asset class and track BTC and ETH in the market data section. Incidentally, the sample [portfolio](examples/profile.yml) for Strategic Asset Allocation includes a 5% allocation for BTC:
+
+![Strategic](./examples/screenshots/strategic.png "Portfolio for Stategic Asset Allocation")
