@@ -84,3 +84,7 @@ Here is what the profile homepage may look like:
 We track the major indices and markets, as well as key commodity prices. We view crypto currency as a viable asset class and track BTC and ETH in the market data section. Incidentally, the sample [portfolio](examples/profile.yml) for Strategic Asset Allocation includes a 5% allocation for BTC:
 
 ![Strategic](./examples/screenshots/strategic.png "Portfolio for Stategic Asset Allocation")
+
+### Performance & Return Analysis
+
+Portfolio-go automatically calculates the performance and return characteristics of each of the portfolios. These are compared against a benchmark, currently the S&P 500 index. The start date of the analysis is selected as either 10 years ago, or the inception date of the newest security in the portfolio, whichever is later. So, if you have a newly IPO'd stock in the portfolio, the length of the analysis period will be determined by its IPO date and greatly shortened. We try to use the target allocation as the starting allocation of the portfolio at the beginning of the analysis period. If the target allocation is not specified, we use the actual current allocation instead. Note that this may greatly differ from your actual portfolio allocation in the past, depending on how your portfolio has evolved over time. On the profile homepage, we calculate the performance and return of the entire profile, by merging all portfolios together and using the actual allocation as the starting allocation of the merged portfolio.
