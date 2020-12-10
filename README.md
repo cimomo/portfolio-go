@@ -94,3 +94,19 @@ The start date of the analysis is selected as either 10 years ago, or the incept
 We try to use the target allocation as the starting allocation of the portfolio at the beginning of the analysis period. If the target allocation is not specified, we use the actual current allocation instead. Note that this may greatly differ from your actual portfolio allocation in the past, depending on how your portfolio has evolved over time. 
 
 On the profile homepage, we calculate the performance and return of the entire profile, by merging all portfolios together and using the actual allocation as the starting allocation of the merged portfolio.
+
+### Portfolio Tracking
+
+We use Yahoo Finance APIs to retrieve real-time market data. Most of the columns are pretty self-explanatory. You can specify an optional watch price for a ticker. When the market price is within 10% of the watch price, it gets highlighted in the portfolio viewer.
+
+```
+cash:
+  value: 10000.00
+  allocation: 10
+portfolios:
+- portfolio: FAAMG
+  allocation: 40
+  holdings:
+  - symbol: TSLA
+    watch: 350
+```
