@@ -12,5 +12,13 @@ func NewPortfolioCmd() *cobra.Command {
 		Long:  ``,
 	}
 
+	addCommands(portfolioCmd)
+
 	return portfolioCmd
+}
+
+func addCommands(cmd *cobra.Command) {
+	cmd.AddCommand(
+		newStartCmd(),
+	)
 }
