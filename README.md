@@ -12,7 +12,7 @@ A terminal based portfolio tracking, analysis and optimization tool implemented 
 
 Start the program by running:
 ```
-portfolio --profile <path-to-profile>
+portfolio start --profile <path-to-profile>
 ```
 
 Portfolios are described using a YAML file. Here is an example:
