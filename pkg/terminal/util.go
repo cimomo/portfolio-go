@@ -23,7 +23,7 @@ func setNonZeroDollarAmount(table *tview.Table, value float64, r int, c int, col
 }
 
 func setDollarAmountAgainstWatch(table *tview.Table, value float64, watch float64, r int, c int) {
-	if watch > 0 && value <= (watch*1.1) {
+	if watch > 0 && value <= watch {
 		setDollarAmount(table, value, r, c, tcell.ColorOrange)
 	} else {
 		setDollarAmount(table, value, r, c, tcell.ColorWhite)
