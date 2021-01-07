@@ -97,7 +97,7 @@ On the profile homepage, we calculate the performance and return of the entire p
 
 ### Portfolio Tracking
 
-We use Yahoo Finance APIs to retrieve real-time market data. Most of the columns are pretty self-explanatory. You can specify an optional watch price for a ticker. When the market price is within 10% of the watch price, it gets highlighted in the portfolio viewer.
+We use Yahoo Finance APIs to retrieve real-time market data. Most of the columns are pretty self-explanatory. You can specify an optional watch price for a ticker. When the market price is at or below the watch price, it gets highlighted in the portfolio viewer.
 
 ```
 cash:
