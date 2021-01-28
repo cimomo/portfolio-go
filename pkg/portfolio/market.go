@@ -19,8 +19,8 @@ const (
 	Treasury10  string = "^TNX"
 	Gold        string = "GC=F"
 	Oil         string = "CL=F"
-	Bitcoin     string = "BTCUSD=X"
-	Ethereum    string = "ETHUSD=X"
+	Bitcoin     string = "BTC-USD"
+	Ethereum    string = "ETH-USD"
 )
 
 // Market defines the broader market indices we track
