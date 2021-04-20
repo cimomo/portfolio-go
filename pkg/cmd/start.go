@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"fmt"
+
 	"github.com/cimomo/portfolio-go/pkg/terminal"
 	"github.com/spf13/cobra"
 )
@@ -27,6 +29,7 @@ func startTerminal(profile string) error {
 
 	err := term.Start()
 	if err != nil {
+		fmt.Println(err)
 		return err
 	}
 
