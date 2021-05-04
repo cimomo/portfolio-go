@@ -1,6 +1,7 @@
 package portfolio
 
 import (
+	"errors"
 	"math"
 	"time"
 
@@ -430,6 +431,10 @@ func computeMonthlyBalances(portfolio *Portfolio, startDate time.Time, endDate t
 
 		if monthly == nil {
 			monthly = make([]Historic, len(monthlyForAsset))
+		}
+
+		if len(monthly) != len(monthlyForAsset) {
+			return nil, errors.New("Mismatch length between monthly and monthlyForAsset")
 		}
 
 		for i := range monthlyForAsset {
